@@ -23,13 +23,6 @@ enum class PieceType {
     CANNON,
 }
 
-enum class Direction {
-    UP,
-    RIGHT,
-    DOWN,
-    LEFT,
-}
-
 enum class RocketColor {
     PINK,
     BLUE,
@@ -55,9 +48,9 @@ sealed class GridItem {
 
 data class GameUiState(
     val grid: Array<Array<GridItem?>> = Array(GRID_HEIGHT) { Array(GRID_WIDTH) { null } },
-    val unusedPieces: List<GridItem.Piece>,
-    val bag: List<GridItem.Piece>,
-    val availablePieces: List<GridItem.Piece>,
+    val unusedPieces: List<GridItem.Piece> = listOf(),
+    val bag: List<GridItem.Piece> = listOf(),
+    val availablePieces: List<GridItem.Piece> = listOf(),
     val score: Int = 0,
 ) {
 

@@ -59,4 +59,25 @@ data class GameUiState(
     val bag: List<GridItem.Piece>,
     val availablePieces: List<GridItem.Piece>,
     val score: Int = 0,
-)
+) {
+
+    // Auto-generated function to handle the array
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as GameUiState
+
+        if (score != other.score) return false
+        if (!grid.contentDeepEquals(other.grid)) return false
+
+        return true
+    }
+
+    // Auto-generated function to handle the array
+    override fun hashCode(): Int {
+        var result = score
+        result = 31 * result + grid.contentDeepHashCode()
+        return result
+    }
+}

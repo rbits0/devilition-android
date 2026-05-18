@@ -5,9 +5,10 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Card
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -21,23 +22,24 @@ fun GridCell(
     item: GridItem? = null,
 ) {
     val elevation = if (item == null) {
-        CardDefaults.cardElevation(0.dp)
+        0.dp
     } else {
-        CardDefaults.cardElevation(2.dp)
+        2.dp
     }
 
 
-    val cardColor = if (item == null) {
+    val surfaceColor = if (item == null) {
         MaterialTheme.colorScheme.surfaceContainer
     } else {
         MaterialTheme.colorScheme.surfaceVariant
     }
 
-    Card(
-        elevation = elevation,
-        colors = CardDefaults.cardColors(cardColor),
+    Surface(
+        tonalElevation = elevation,
+        shadowElevation = elevation,
+        color = surfaceColor,
+        shape = RoundedCornerShape(6.dp),
         modifier = modifier
-            .fillMaxWidth()
             .aspectRatio(1f),
     ) {
         Box(

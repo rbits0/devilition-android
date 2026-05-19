@@ -1,20 +1,21 @@
 package com.rbits.devilition.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.rbits.devilition.R
 import com.rbits.devilition.ui.theme.DevilitionTheme
 
 @Composable
@@ -48,9 +49,10 @@ fun GridCell(
                 .padding(4.dp),
         ) {
             if (item is GridItem.Piece) {
-                GridImage(
-                    item,
-                    modifier = Modifier.fillMaxSize()
+                Image(
+                    painter = painterResource(R.drawable.snake_vertical),
+                    contentDescription = stringResource(R.string.snake),
+                    modifier = Modifier.fillMaxSize(),
                 )
             }
         }

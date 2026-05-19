@@ -59,8 +59,11 @@ const val previewWidth = 375
 @Composable
 fun GameGridPreview() {
     val gridState = Array(GRID_HEIGHT) { Array<GridItem?>(GRID_WIDTH) {
-        GridItem.Piece(type = PieceType.SNAKE, rotation = 0)
-//        null
+        if (it % 2 == 0) {
+            GridItem.Piece(type = PieceType.SNAKE, rotation = 0)
+        } else {
+            null
+        }
     } }
 
     DevilitionTheme(darkTheme = true) {

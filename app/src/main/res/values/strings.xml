@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Devilition</string>
+    <string name="snake">Snake</string>
 </resources>

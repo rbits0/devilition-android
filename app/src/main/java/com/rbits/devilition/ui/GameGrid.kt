@@ -18,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.mohamedrejeb.compose.dnd.DragAndDropState
+import com.mohamedrejeb.compose.dnd.rememberDragAndDropState
 import com.rbits.devilition.data.GRID_HEIGHT
 import com.rbits.devilition.data.GRID_WIDTH
 import com.rbits.devilition.ui.theme.DevilitionTheme
@@ -25,23 +27,30 @@ import com.rbits.devilition.ui.theme.DevilitionTheme
 @Composable
 fun GameGrid(
     gridState: Array<Array<GridItem?>>,
+    dragAndDropState: DragAndDropState<GridItem.Piece>,
+    onItemDropped: (GridItem.Piece, Pair<Int, Int>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
             .width(IntrinsicSize.Max)
     ) {
-        gridState.forEach { row ->
+        gridState.withIndex().forEach { (rowIndex, row) ->
             Row(
                 modifier = Modifier
                     .weight(1f, fill = false),
             ) {
-                row.forEach { item ->
+                row.withIndex().forEach { (colIndex, item) ->
                     GridCell(
+                        dragAndDropState,
+                        position = Pair(rowIndex, colIndex),
                         item = item,
+                        onItemDropped = { item ->
+                            onItemDropped(item, Pair(rowIndex, colIndex))
+                        },
                         modifier = Modifier
                             .weight(1f)
-                            .padding(2.dp)
+                            .padding(2.dp),
                     )
                 }
             }
@@ -60,7 +69,11 @@ private const val previewWidth = 375
 fun GameGridPreview() {
     val gridState = Array(GRID_HEIGHT) { Array<GridItem?>(GRID_WIDTH) {
         if (it % 2 == 0) {
-            GridItem.Piece(type = PieceType.SNAKE, facing = Direction.DOWN)
+            GridItem.Piece(
+                type = PieceType.SNAKE,
+                facing = Direction.DOWN,
+                id = 0,
+            )
         } else {
             null
         }
@@ -72,8 +85,10 @@ fun GameGridPreview() {
                 .size(height = previewHeight.dp, width = previewWidth.dp)
         ) {
             GameGrid(
-                gridState = gridState,
-                modifier = Modifier
+                gridState,
+                rememberDragAndDropState(),
+                onItemDropped = {_, _ -> },
+                modifier = Modifier,
             )
         }
     }

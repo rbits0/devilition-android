@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.rbits.devilition.R
 
 @Composable
-fun GridItem(
+fun GridCellItem(
     item: GridItem,
     modifier: Modifier = Modifier,
 ) {

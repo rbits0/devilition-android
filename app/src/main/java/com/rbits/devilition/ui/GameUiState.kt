@@ -46,6 +46,8 @@ sealed class GridItem {
     data class Piece(
         val type: PieceType,
         val facing: Direction,
+        val id: Int,
+        val position: Pair<Int, Int>? = null,
         val color: RocketColor? = null,
     ) : GridItem()
 

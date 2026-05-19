@@ -1,6 +1,7 @@
 package com.rbits.devilition.ui
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -11,6 +12,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.mohamedrejeb.compose.dnd.DragAndDropContainer
+import com.mohamedrejeb.compose.dnd.rememberDragAndDropState
 import com.rbits.devilition.data.GRID_HEIGHT
 import com.rbits.devilition.data.GRID_WIDTH
 import com.rbits.devilition.ui.theme.DevilitionTheme
@@ -21,11 +24,24 @@ fun GameScreen(
     gameViewModel: GameViewModel = viewModel(),
 ) {
     val gameUiState by gameViewModel.uiState.collectAsState()
+    val dragAndDropState = rememberDragAndDropState<GridItem.Piece>()
 
     gameViewModel.nextRound()
 
 
-    GameGrid(gameUiState.grid, modifier = modifier)
+    DragAndDropContainer(
+        state = dragAndDropState,
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        GameGrid(
+            gameUiState.grid,
+            dragAndDropState,
+            onItemDropped = {item, position ->
+                gameViewModel.movePiece(item, position)
+            },
+            modifier = modifier,
+        )
+    }
 }
 
 

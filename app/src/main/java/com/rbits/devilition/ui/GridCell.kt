@@ -65,7 +65,7 @@ fun GridCell(
 fun GridCellPreview() {
     val piece = GridItem.Piece(
         type = PieceType.SNAKE,
-        rotation = 0,
+        facing = Direction.DOWN,
     )
 
     DevilitionTheme(darkTheme = true) {

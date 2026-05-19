@@ -1,5 +1,7 @@
 package com.rbits.devilition.ui
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -20,24 +22,27 @@ fun GameScreen(
 ) {
     val gameUiState by gameViewModel.uiState.collectAsState()
 
-//    var pixels: Float
-//    with(LocalDensity.current) {
-//        pixels = 1.dp.toPx()
-//    }
+    gameViewModel.nextRound()
 
-    // TODO: Remove
-    val gridState = Array(GRID_HEIGHT) { Array<GridItem?>(GRID_WIDTH) {
-        GridItem.Piece(type = PieceType.SNAKE, rotation = 0)
-    } }
 
-    GameGrid(gridState, modifier = modifier)
+    GameGrid(gameUiState.grid, modifier = modifier)
 }
 
 
-@Preview(showBackground = true)
+private const val previewHeight = 835
+private const val previewWidth = 375
+//private const val previewHeight = 375
+//private const val previewWidth = 835
+
+@Preview(showBackground = false, widthDp = previewWidth, heightDp = previewHeight)
 @Composable
 fun GameScreenPreview() {
-    DevilitionTheme {
-        GameScreen()
+    DevilitionTheme(darkTheme = true) {
+        Box(
+            modifier = Modifier
+                .size(height = previewHeight.dp, width = previewWidth.dp)
+        ) {
+            GameScreen()
+        }
     }
 }

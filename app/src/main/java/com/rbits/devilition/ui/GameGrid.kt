@@ -50,17 +50,17 @@ fun GameGrid(
 }
 
 
-const val previewHeight = 835
-const val previewWidth = 375
-//const val previewHeight = 375
-//const val previewWidth = 835
+private const val previewHeight = 835
+private const val previewWidth = 375
+//private const val previewHeight = 375
+//private const val previewWidth = 835
 
 @Preview(showBackground = false, widthDp = previewWidth, heightDp = previewHeight)
 @Composable
 fun GameGridPreview() {
     val gridState = Array(GRID_HEIGHT) { Array<GridItem?>(GRID_WIDTH) {
         if (it % 2 == 0) {
-            GridItem.Piece(type = PieceType.SNAKE, rotation = 0)
+            GridItem.Piece(type = PieceType.SNAKE, facing = Direction.DOWN)
         } else {
             null
         }

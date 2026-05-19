@@ -28,6 +28,13 @@ enum class RocketColor {
     BLUE,
 }
 
+enum class Direction {
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT,
+}
+
 sealed class GridItem {
 
     data class Demon(
@@ -38,9 +45,11 @@ sealed class GridItem {
 
     data class Piece(
         val type: PieceType,
-        val rotation: Int,
+        val facing: Direction,
         val color: RocketColor? = null,
     ) : GridItem()
+
+    class Hole() : GridItem()
 
 }
 
@@ -51,6 +60,7 @@ data class GameUiState(
     val unusedPieces: List<GridItem.Piece> = listOf(),
     val bag: List<GridItem.Piece> = listOf(),
     val availablePieces: List<GridItem.Piece> = listOf(),
+    val round: Int = 0,
     val score: Int = 0,
 ) {
 

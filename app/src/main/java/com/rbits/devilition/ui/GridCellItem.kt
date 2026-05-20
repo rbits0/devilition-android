@@ -10,6 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -22,7 +23,7 @@ fun GridCellItem(
 ) {
     val surfaceColor = when (item) {
         is GridItem.Demon, is GridItem.Piece -> MaterialTheme.colorScheme.surfaceVariant
-        is GridItem.Hole -> MaterialTheme.colorScheme.background
+        is GridItem.Hole, is GridItem.BossHitbox -> Color.Transparent
     }
 
     Surface(

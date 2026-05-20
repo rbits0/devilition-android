@@ -6,14 +6,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 class GameViewModel : ViewModel() {
-    private val _uiState = MutableStateFlow(GameUiState())
+    private val _uiState = MutableStateFlow(GameUiState.new())
     val uiState = _uiState.asStateFlow()
 
     fun roundStart() {
         _uiState.update { it.roundStart() }
     }
 
-    fun movePiece(item: GridItem.Piece, to: Pair<Int, Int>) {
+    fun movePiece(item: GridItem.Piece, to: PiecePos.GridPos) {
         _uiState.update { it.movePiece(item, to) }
     }
 }

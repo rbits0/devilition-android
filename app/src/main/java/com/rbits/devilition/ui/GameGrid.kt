@@ -28,7 +28,7 @@ import com.rbits.devilition.ui.theme.DevilitionTheme
 fun GameGrid(
     gridState: Array<Array<GridItem?>>,
     dragAndDropState: DragAndDropState<GridItem.Piece>,
-    onItemDropped: (GridItem.Piece, Pair<Int, Int>) -> Unit,
+    onItemDropped: (GridItem.Piece, PiecePos.GridPos) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -46,7 +46,7 @@ fun GameGrid(
                         position = Pair(rowIndex, colIndex),
                         item = item,
                         onItemDropped = { item ->
-                            onItemDropped(item, Pair(rowIndex, colIndex))
+                            onItemDropped(item, PiecePos.GridPos(rowIndex, colIndex))
                         },
                         modifier = Modifier
                             .weight(1f)

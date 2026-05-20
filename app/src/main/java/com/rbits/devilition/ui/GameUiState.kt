@@ -3,12 +3,14 @@ package com.rbits.devilition.ui
 import android.util.Log
 import com.rbits.devilition.data.GRID_HEIGHT
 import com.rbits.devilition.data.GRID_WIDTH
-import com.rbits.devilition.data.HAND_SIZE
 import com.rbits.devilition.data.demonTypeHealth
 import com.rbits.devilition.data.demonsPerRound
 import com.rbits.devilition.data.piecesPerRound
+import com.rbits.devilition.data.tierPieces
 import kotlin.collections.component1
 import kotlin.collections.component2
+import kotlin.collections.get
+import kotlin.collections.set
 
 private const val TAG = "GameUiState"
 
@@ -43,6 +45,11 @@ enum class Direction {
     RIGHT,
 }
 
+sealed class PiecePos {
+    data class GridPos(val x: Int, val y: Int) : PiecePos()
+    data class HandPos(val pos: Int) : PiecePos()
+}
+
 sealed class GridItem {
 
     data class Demon(
@@ -61,8 +68,9 @@ sealed class GridItem {
         val type: PieceType,
         val facing: Direction,
         val id: Int,
-        val position: Pair<Int, Int>? = null,
-        val color: RocketColor? = null,
+        val position: PiecePos? = null,
+        val color: RocketColor = RocketColor.entries.random(),
+        var rocketTargetId: Int? = null,
     ) : GridItem()
 
     class Hole() : GridItem()
@@ -74,12 +82,42 @@ sealed class GridItem {
 data class GameUiState(
     val grid: Array<Array<GridItem?>> = Array(GRID_HEIGHT) { Array(GRID_WIDTH) { null } },
     val hand: Array<GridItem.Piece>,
-    val bag: List<GridItem.Piece> = listOf(),
+    val bag: List<PieceType> = listOf(),
     val numAvailablePieces: Int = 0,
     val round: Int = 0,
     val score: Int = 0,
     val idCounter: Int = 0,
 ) {
+
+    companion object {
+        fun new(): GameUiState {
+            val bag: MutableList<PieceType> = mutableListOf()
+            var idCounter = 0
+            val hand: MutableList<GridItem.Piece> = mutableListOf()
+
+            // Start with 3 pieces in hand
+            for (i in 0..<3) {
+                val id = idCounter
+                val type = drawNewPiece(bag)
+                idCounter++
+                hand.add(
+                    GridItem.Piece(
+                        type = type,
+                        facing = Direction.DOWN,
+                        id = id,
+                        position = PiecePos.HandPos(i),
+                    )
+                )
+            }
+
+            return GameUiState(
+                hand = hand.toTypedArray(),
+                bag = bag,
+                idCounter = idCounter,
+            )
+        }
+    }
+
 
     // Auto-generated function to handle the array
     override fun equals(other: Any?): Boolean {
@@ -102,8 +140,8 @@ data class GameUiState(
     }
 
     fun roundStart(): GameUiState {
-        val grid = this.grid.map{ it.clone() }.toTypedArray()
-        val round = this.round + 1
+        val grid = grid.map{ it.clone() }.toTypedArray()
+        val round = round + 1
 
         if (round < 10) {
             // Heal all elder demons
@@ -181,7 +219,7 @@ data class GameUiState(
             }
         }
 
-        val numAvailablePieces = this.numAvailablePieces + piecesPerRound(round)
+        val numAvailablePieces = numAvailablePieces + piecesPerRound(round)
 
         return this.copy(
             grid = grid,
@@ -190,18 +228,68 @@ data class GameUiState(
         )
     }
 
-    fun movePiece(item: GridItem.Piece, to: Pair<Int, Int>): GameUiState {
-        val grid = this.grid.map { it.clone() }.toTypedArray()
+    fun movePiece(item: GridItem.Piece, to: PiecePos.GridPos): GameUiState {
+        val grid = grid.map { it.clone() }.toTypedArray()
+        var idCounter = idCounter
+        var bag = bag
+        var hand = hand
 
         val from = item.position
         if (from == null) {
             Log.e(TAG, "Piece position is null")
             return this
         }
-        grid[from.first][from.second] = null
-        grid[to.first][to.second] = item.copy(position = to)
 
-        return this.copy(grid = grid)
+        when (from) {
+            is PiecePos.GridPos -> {
+                grid[from.x][from.y] = null
+                grid[to.x][to.y] = item.copy(position = to)
+            }
+            is PiecePos.HandPos -> {
+                val newBag: MutableList<PieceType> = mutableListOf()
+                val newHand = hand.clone()
+                val id = idCounter
+                idCounter++
+
+                if (item.type == PieceType.ROCKET) {
+                    // Replace rocket with pad instead of drawing from bag
+                    newHand[from.pos] = GridItem.Piece(
+                        type = PieceType.ROCKET_PAD,
+                        facing = Direction.DOWN,
+                        position = from,
+                        id = id,
+                        color = item.color,
+                    )
+
+                    grid[to.x][to.y] = item.copy(
+                        position = to,
+                        rocketTargetId = id,
+                    )
+                } else {
+                    // Draw piece from bag to replace moved piece
+                    val type = drawNewPiece(newBag)
+                    newHand[from.pos] = GridItem.Piece(
+                        type = type,
+                        facing = Direction.DOWN,
+                        id = id,
+                        position = from,
+                    )
+
+                    grid[to.x][to.y] = item.copy(position = to)
+
+                }
+
+                bag = newBag
+                hand = newHand
+            }
+        }
+
+        return this.copy(
+            grid = grid,
+            hand = hand,
+            bag = bag,
+            idCounter = idCounter,
+        )
     }
 }
 
@@ -211,5 +299,26 @@ fun getEmptySpaces(grid: Array<Array<GridItem?>>): List<Pair<Int, Int>> {
             if (item == null) Pair(rowIndex, colIndex) else null
         }
     }
+}
+
+fun drawNewPiece(bag: MutableList<PieceType>): PieceType {
+    if (bag.isEmpty()) {
+        // 1 Tier 1 piece
+        bag.add(tierPieces[1]!!.random())
+
+        // 3 Tier 2 pieces
+        for (i in 0..<3) {
+            bag.add(tierPieces[2]!!.random())
+        }
+
+        // 2 Tier 3 pieces
+        for (i in 0..<2) {
+            bag.add(tierPieces[3]!!.random())
+        }
+
+        bag.shuffle()
+    }
+
+    return bag.removeAt(bag.lastIndex)
 }
 

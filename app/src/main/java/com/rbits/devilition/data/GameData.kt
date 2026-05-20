@@ -1,10 +1,17 @@
 package com.rbits.devilition.data
 
 import com.rbits.devilition.ui.DemonType
+import com.rbits.devilition.ui.PieceType
 
 const val GRID_HEIGHT = 8
 const val GRID_WIDTH = 10
 const val HAND_SIZE = 3
+
+val tierPieces = mapOf(
+    1 to listOf(PieceType.CANNON, PieceType.ROCKET, PieceType.BOMB),
+    2 to listOf(PieceType.PLUS, PieceType.CROSS, PieceType.TOAD),
+    3 to listOf(PieceType.STRAWMAN, PieceType.SNAKE),
+)
 
 fun demonsPerRound(round: Int): Map<DemonType, Int>  =
     when (round) {

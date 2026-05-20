@@ -1,8 +1,12 @@
 package com.rbits.devilition.ui
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -34,7 +38,10 @@ fun GameScreen(
         state = dragAndDropState,
         modifier = Modifier.fillMaxSize(),
     ) {
-        BoxWithConstraints(){
+        BoxWithConstraints(
+            modifier = modifier
+                .padding(4.dp)
+        ) {
             val itemUsableWidth = maxWidth - (GRID_SPACING_DP * (GRID_WIDTH - 1)).dp
             val itemUsableHeight = maxHeight - (GRID_SPACING_DP * (GRID_HEIGHT - 1)).dp
             val isGridMaxWidth = (itemUsableWidth / itemUsableHeight) < (GRID_WIDTH / GRID_HEIGHT)
@@ -44,15 +51,27 @@ fun GameScreen(
                 itemUsableHeight / GRID_HEIGHT
             }
 
-            GameGrid(
-                gameUiState.grid,
-                dragAndDropState,
-                onItemDropped = {item, position ->
-                    gameViewModel.movePiece(item, position)
-                },
-                cellSize = cellSize,
-                modifier = modifier,
-            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                GameGrid(
+                    gameUiState.grid,
+                    dragAndDropState,
+                    onItemDropped = {item, position ->
+                        gameViewModel.movePiece(item, position)
+                    },
+                    cellSize = cellSize,
+                )
+
+                Hand(
+                    handState = gameUiState.hand,
+                    numAvailablePieces = gameUiState.numAvailablePieces,
+                    dragAndDropState = dragAndDropState,
+                    cellSize = cellSize,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+            }
         }
     }
 }

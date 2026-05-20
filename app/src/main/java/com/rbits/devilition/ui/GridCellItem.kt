@@ -25,10 +25,14 @@ fun GridCellItem(
         is GridItem.Demon, is GridItem.Piece -> MaterialTheme.colorScheme.surfaceVariant
         is GridItem.Hole, is GridItem.BossHitbox -> Color.Transparent
     }
+    val elevation = when (item) {
+        is GridItem.Demon, is GridItem.Piece -> 2.dp
+        is GridItem.Hole, is GridItem.BossHitbox -> 0.dp
+    }
 
     Surface(
-        tonalElevation = 0.dp,
-        shadowElevation = 0.dp,
+        tonalElevation = elevation,
+        shadowElevation = elevation,
         color = surfaceColor,
         shape = RoundedCornerShape(6.dp),
         modifier = modifier

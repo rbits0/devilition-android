@@ -3,6 +3,7 @@ package com.rbits.devilition.ui
 import android.util.Log
 import com.rbits.devilition.data.GRID_HEIGHT
 import com.rbits.devilition.data.GRID_WIDTH
+import com.rbits.devilition.data.HAND_SIZE
 import com.rbits.devilition.data.demonTypeHealth
 import com.rbits.devilition.data.demonsPerRound
 import com.rbits.devilition.data.piecesPerRound
@@ -95,8 +96,8 @@ data class GameUiState(
             var idCounter = 0
             val hand: MutableList<GridItem.Piece> = mutableListOf()
 
-            // Start with 3 pieces in hand
-            for (i in 0..<3) {
+            // Start with `HAND_SIZE` pieces in hand
+            for (i in 0..<HAND_SIZE) {
                 val id = idCounter
                 val type = drawNewPiece(bag)
                 idCounter++

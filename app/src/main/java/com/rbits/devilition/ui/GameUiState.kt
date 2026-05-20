@@ -43,6 +43,12 @@ sealed class GridItem {
         val maxHealth: Int,
     ) : GridItem()
 
+    // Boss takes up a 2x2 space
+    // If this item is hit, it should damage the boss
+    data class BossHitbox(
+        val bossPos: Pair<Int, Int>,
+    ) : GridItem()
+
     data class Piece(
         val type: PieceType,
         val facing: Direction,
@@ -59,9 +65,9 @@ sealed class GridItem {
 
 data class GameUiState(
     val grid: Array<Array<GridItem?>> = Array(GRID_HEIGHT) { Array(GRID_WIDTH) { null } },
-    val unusedPieces: List<GridItem.Piece> = listOf(),
+    val hand: List<GridItem.Piece> = listOf(),
     val bag: List<GridItem.Piece> = listOf(),
-    val availablePieces: List<GridItem.Piece> = listOf(),
+    val numAvailablePieces: Int = 0,
     val round: Int = 0,
     val score: Int = 0,
 ) {

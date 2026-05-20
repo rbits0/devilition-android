@@ -1,22 +1,14 @@
 package com.rbits.devilition.ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.mohamedrejeb.compose.dnd.DragAndDropState
 import com.mohamedrejeb.compose.dnd.rememberDragAndDropState
@@ -29,16 +21,16 @@ fun GameGrid(
     gridState: Array<Array<GridItem?>>,
     dragAndDropState: DragAndDropState<GridItem.Piece>,
     onItemDropped: (GridItem.Piece, PiecePos.GridPos) -> Unit,
+    cellSize: Dp,
     modifier: Modifier = Modifier,
 ) {
     Column(
+        verticalArrangement = Arrangement.spacedBy(GRID_SPACING_DP.dp),
         modifier = modifier
-            .width(IntrinsicSize.Max)
     ) {
         gridState.withIndex().forEach { (rowIndex, row) ->
             Row(
-                modifier = Modifier
-                    .weight(1f, fill = false),
+                horizontalArrangement = Arrangement.spacedBy(GRID_SPACING_DP.dp),
             ) {
                 row.withIndex().forEach { (colIndex, item) ->
                     GridCell(
@@ -49,8 +41,7 @@ fun GameGrid(
                             onItemDropped(item, PiecePos.GridPos(rowIndex, colIndex))
                         },
                         modifier = Modifier
-                            .weight(1f)
-                            .padding(2.dp),
+                            .size(cellSize)
                     )
                 }
             }
@@ -88,6 +79,7 @@ fun GameGridPreview() {
                 gridState,
                 rememberDragAndDropState(),
                 onItemDropped = {_, _ -> },
+                cellSize = 30.dp,
                 modifier = Modifier,
             )
         }

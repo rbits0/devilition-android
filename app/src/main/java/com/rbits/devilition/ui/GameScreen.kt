@@ -1,6 +1,7 @@
 package com.rbits.devilition.ui
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -12,7 +13,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mohamedrejeb.compose.dnd.DragAndDropContainer
 import com.mohamedrejeb.compose.dnd.rememberDragAndDropState
+import com.rbits.devilition.data.GRID_HEIGHT
+import com.rbits.devilition.data.GRID_WIDTH
 import com.rbits.devilition.ui.theme.DevilitionTheme
+
+const val GRID_SPACING_DP = 2
 
 @Composable
 fun GameScreen(
@@ -29,14 +34,26 @@ fun GameScreen(
         state = dragAndDropState,
         modifier = Modifier.fillMaxSize(),
     ) {
-        GameGrid(
-            gameUiState.grid,
-            dragAndDropState,
-            onItemDropped = {item, position ->
-                gameViewModel.movePiece(item, position)
-            },
-            modifier = modifier,
-        )
+        BoxWithConstraints(){
+            val itemUsableWidth = maxWidth - (GRID_SPACING_DP * (GRID_WIDTH - 1)).dp
+            val itemUsableHeight = maxHeight - (GRID_SPACING_DP * (GRID_HEIGHT - 1)).dp
+            val isGridMaxWidth = (itemUsableWidth / itemUsableHeight) < (GRID_WIDTH / GRID_HEIGHT)
+            val cellSize = if (isGridMaxWidth) {
+                itemUsableWidth / GRID_WIDTH
+            } else {
+                itemUsableHeight / GRID_HEIGHT
+            }
+
+            GameGrid(
+                gameUiState.grid,
+                dragAndDropState,
+                onItemDropped = {item, position ->
+                    gameViewModel.movePiece(item, position)
+                },
+                cellSize = cellSize,
+                modifier = modifier,
+            )
+        }
     }
 }
 

@@ -2,38 +2,13 @@ package com.rbits.devilition.ui
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.rbits.devilition.data.demonTypeHealth
+import com.rbits.devilition.data.demonsPerRound
+import com.rbits.devilition.data.piecesPerRound
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlin.collections.mapOf
-
-fun demonsPerRound(round: Int): Map<DemonType, Int>  =
-    when (round) {
-        1 -> mapOf(DemonType.MINOR to 8, DemonType.MAJOR to 0, DemonType.ELDER to 0)
-        2 -> mapOf(DemonType.MINOR to 9, DemonType.MAJOR to 0, DemonType.ELDER to 0)
-        3 -> mapOf(DemonType.MINOR to 9, DemonType.MAJOR to 1, DemonType.ELDER to 0)
-        4 -> mapOf(DemonType.MINOR to 9, DemonType.MAJOR to 2, DemonType.ELDER to 0)
-        5 -> mapOf(DemonType.MINOR to 9, DemonType.MAJOR to 3, DemonType.ELDER to 0)
-        6 -> mapOf(DemonType.MINOR to 9, DemonType.MAJOR to 3, DemonType.ELDER to 1)
-        7 -> mapOf(DemonType.MINOR to 9, DemonType.MAJOR to 3, DemonType.ELDER to 2)
-        8 -> mapOf(DemonType.MINOR to 9, DemonType.MAJOR to 3, DemonType.ELDER to 3)
-        else -> mapOf(DemonType.MINOR to 9, DemonType.MAJOR to 3, DemonType.ELDER to 4)
-    }
-fun piecesPerRound(round: Int): Int =
-    when (round) {
-        1, 2, 5, 8, 9 -> 15
-        3, 6 -> 10
-        4, 7 -> 20
-        else -> 0
-    }
-
-fun demonTypeHealth(demonType: DemonType): Int =
-    when (demonType) {
-        DemonType.MINOR -> 1
-        DemonType.MAJOR -> 2
-        DemonType.ELDER -> 2
-        DemonType.BOSS -> 10
-    }
 
 fun getEmptySpaces(grid: Array<Array<GridItem?>>): List<Pair<Int, Int>> {
     return grid.flatMapIndexed { rowIndex, row ->

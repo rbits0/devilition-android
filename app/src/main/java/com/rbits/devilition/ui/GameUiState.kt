@@ -2,6 +2,7 @@ package com.rbits.devilition.ui
 
 import com.rbits.devilition.data.GRID_HEIGHT
 import com.rbits.devilition.data.GRID_WIDTH
+import com.rbits.devilition.data.HAND_SIZE
 
 
 enum class DemonType {
@@ -65,11 +66,12 @@ sealed class GridItem {
 
 data class GameUiState(
     val grid: Array<Array<GridItem?>> = Array(GRID_HEIGHT) { Array(GRID_WIDTH) { null } },
-    val hand: List<GridItem.Piece> = listOf(),
+    val hand: Array<GridItem.Piece>,
     val bag: List<GridItem.Piece> = listOf(),
     val numAvailablePieces: Int = 0,
     val round: Int = 0,
     val score: Int = 0,
+    val idCounter: Int = 0,
 ) {
 
     // Auto-generated function to handle the array

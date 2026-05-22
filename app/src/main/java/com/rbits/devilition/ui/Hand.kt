@@ -34,7 +34,7 @@ fun Hand(
     Surface(
         tonalElevation = 2.dp,
         shadowElevation = 2.dp,
-        color = MaterialTheme.colorScheme.surfaceContainer,
+        color = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(12.dp),
         modifier = modifier,
     ) {

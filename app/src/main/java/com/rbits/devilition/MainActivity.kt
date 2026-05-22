@@ -14,6 +14,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.rbits.devilition.ui.GameScreen
 import com.rbits.devilition.ui.theme.DevilitionTheme
 
+const val TAG = "devilition"
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -1,6 +1,7 @@
 package com.rbits.devilition.ui
 
 import android.util.Log
+import com.rbits.devilition.TAG
 import com.rbits.devilition.data.GRID_HEIGHT
 import com.rbits.devilition.data.GRID_WIDTH
 import com.rbits.devilition.data.HAND_SIZE
@@ -12,8 +13,6 @@ import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.get
 import kotlin.collections.set
-
-private const val TAG = "GameUiState"
 
 enum class DemonType {
     MINOR,

@@ -3,12 +3,13 @@ package com.rbits.devilition.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.mohamedrejeb.compose.dnd.DragAndDropState
 import com.mohamedrejeb.compose.dnd.rememberDragAndDropState
@@ -21,16 +22,18 @@ fun GameGrid(
     gridState: Array<Array<GridItem?>>,
     dragAndDropState: DragAndDropState<GridItem.Piece>,
     onItemDropped: (GridItem.Piece, PiecePos.GridPos) -> Unit,
-    cellSize: Dp,
     modifier: Modifier = Modifier,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(GRID_SPACING_DP.dp),
         modifier = modifier
+            .width(IntrinsicSize.Max),
     ) {
         gridState.withIndex().forEach { (rowIndex, row) ->
             Row(
                 horizontalArrangement = Arrangement.spacedBy(GRID_SPACING_DP.dp),
+                modifier = Modifier
+                    .weight(1f, fill = false),
             ) {
                 row.withIndex().forEach { (colIndex, item) ->
                     GridCell(
@@ -41,7 +44,7 @@ fun GameGrid(
                             onItemDropped(item, PiecePos.GridPos(rowIndex, colIndex))
                         },
                         modifier = Modifier
-                            .size(cellSize)
+                            .weight(1f),
                     )
                 }
             }
@@ -79,7 +82,6 @@ fun GameGridPreview() {
                 gridState,
                 rememberDragAndDropState(),
                 onItemDropped = {_, _ -> },
-                cellSize = 30.dp,
                 modifier = Modifier,
             )
         }

@@ -126,16 +126,26 @@ data class GameUiState(
 
         other as GameUiState
 
+        if (numAvailablePieces != other.numAvailablePieces) return false
+        if (round != other.round) return false
         if (score != other.score) return false
+        if (idCounter != other.idCounter) return false
         if (!grid.contentDeepEquals(other.grid)) return false
+        if (!hand.contentEquals(other.hand)) return false
+        if (bag != other.bag) return false
 
         return true
     }
 
     // Auto-generated function to handle the array
     override fun hashCode(): Int {
-        var result = score
+        var result = numAvailablePieces
+        result = 31 * result + round
+        result = 31 * result + score
+        result = 31 * result + idCounter
         result = 31 * result + grid.contentDeepHashCode()
+        result = 31 * result + hand.contentHashCode()
+        result = 31 * result + bag.hashCode()
         return result
     }
 

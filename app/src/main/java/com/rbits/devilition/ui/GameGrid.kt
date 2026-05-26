@@ -22,6 +22,7 @@ fun GameGrid(
     gridState: Array<Array<GridItem?>>,
     dragAndDropState: DragAndDropState<GridItem.Piece>,
     onItemDropped: (GridItem.Piece, PiecePos.GridPos) -> Unit,
+    onItemRotated: (GridItem.Piece) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -43,6 +44,7 @@ fun GameGrid(
                         onItemDropped = { item ->
                             onItemDropped(item, PiecePos.GridPos(rowIndex, colIndex))
                         },
+                        onItemRotated = onItemRotated,
                         modifier = Modifier
                             .weight(1f),
                     )
@@ -82,6 +84,7 @@ fun GameGridPreview() {
                 gridState,
                 rememberDragAndDropState(),
                 onItemDropped = {_, _ -> },
+                onItemRotated = {},
                 modifier = Modifier,
             )
         }

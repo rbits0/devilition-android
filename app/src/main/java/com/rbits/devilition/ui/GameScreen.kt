@@ -62,8 +62,11 @@ fun GameScreen(
                 GameGrid(
                     gameUiState.grid,
                     dragAndDropState,
-                    onItemDropped = {item, position ->
+                    onItemDropped = { item, position ->
                         gameViewModel.movePiece(item, position)
+                    },
+                    onItemRotated = { item ->
+                        gameViewModel.rotatePiece(item)
                     },
                 )
 
@@ -73,6 +76,9 @@ fun GameScreen(
                     dragAndDropState = dragAndDropState,
                     cellSize = cellSize,
                     enabled = gameUiState.canPlacePiece(),
+                    onItemRotated = { item ->
+                        gameViewModel.rotatePiece(item)
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                 )

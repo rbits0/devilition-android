@@ -11,8 +11,6 @@ import com.rbits.devilition.data.piecesPerRound
 import com.rbits.devilition.data.tierPieces
 import kotlin.collections.component1
 import kotlin.collections.component2
-import kotlin.collections.get
-import kotlin.collections.set
 
 enum class DemonType {
     MINOR,
@@ -311,7 +309,33 @@ data class GameUiState(
         )
     }
 
-    fun canPlacePiece() = numAvailablePieces > 0
+    fun rotatePiece(item: GridItem.Piece): GameUiState {
+        when (val pos = item.position) {
+
+            is PiecePos.GridPos -> {
+                val grid = grid.map{ it.clone() }.toTypedArray()
+                grid[pos.x][pos.y] = item.copy(
+                    facing = rotateClockwise(item.facing)
+                )
+
+                return this.copy(grid = grid)
+            }
+
+            is PiecePos.HandPos -> {
+                val hand = hand.clone()
+                hand[pos.pos] = item.copy(
+                    facing = rotateClockwise(item.facing)
+                )
+
+                return this.copy(hand = hand)
+            }
+
+            null -> return this
+
+        }
+    }
+
+    fun canPlacePiece(): Boolean = numAvailablePieces > 0
 }
 
 fun getEmptySpaces(grid: Array<Array<GridItem?>>): List<Pair<Int, Int>> {
@@ -342,4 +366,12 @@ fun drawNewPiece(bag: MutableList<PieceType>): PieceType {
 
     return bag.removeAt(bag.lastIndex)
 }
+
+fun rotateClockwise(direction: Direction) =
+    when (direction) {
+        Direction.UP -> Direction.RIGHT
+        Direction.RIGHT -> Direction.DOWN
+        Direction.DOWN -> Direction.LEFT
+        Direction.LEFT -> Direction.UP
+    }
 

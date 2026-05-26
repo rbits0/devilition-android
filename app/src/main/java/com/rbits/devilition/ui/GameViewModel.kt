@@ -16,4 +16,8 @@ class GameViewModel : ViewModel() {
     fun movePiece(item: GridItem.Piece, to: PiecePos.GridPos) {
         _uiState.update { it.movePiece(item, to) }
     }
+
+    fun rotatePiece(item: GridItem.Piece) {
+        _uiState.update { it.rotatePiece(item) }
+    }
 }

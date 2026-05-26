@@ -30,6 +30,7 @@ fun Hand(
     dragAndDropState: DragAndDropState<GridItem.Piece>,
     cellSize: Dp,
     enabled: Boolean,
+    onItemRotated: (GridItem.Piece) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -62,6 +63,7 @@ fun Hand(
                     ) {
                         GridCellItem(
                             item = item,
+                            onClick = { onItemRotated(item) },
                             modifier = Modifier
                                 .size(cellSize)
                                 .graphicsLayer {
@@ -96,6 +98,7 @@ fun HandPreview() {
                 dragAndDropState = rememberDragAndDropState(),
                 cellSize = 30.dp,
                 enabled = true,
+                onItemRotated = {},
                 modifier = Modifier
                     .fillMaxSize()
                 ,

@@ -1,5 +1,6 @@
 package com.rbits.devilition.ui
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
@@ -20,6 +21,7 @@ import com.rbits.devilition.R
 fun GridCellItem(
     item: GridItem,
     modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
 ) {
     val surfaceColor = when (item) {
         is GridItem.Demon, is GridItem.Piece -> MaterialTheme.colorScheme.surfaceVariant
@@ -35,6 +37,7 @@ fun GridCellItem(
         shadowElevation = elevation,
         color = surfaceColor,
         shape = RoundedCornerShape(6.dp),
+        onClick = { onClick?.invoke() },
         modifier = modifier
             .aspectRatio(1f),
     ) {
@@ -44,11 +47,21 @@ fun GridCellItem(
         ) {
             if (item is GridItem.Piece) {
                 Image(
-                    painter = painterResource(R.drawable.snake_vertical),
+                    painter = painterResource(getImageId(item)),
                     contentDescription = stringResource(R.string.snake),
                     modifier = Modifier.fillMaxSize(),
                 )
             }
         }
+    }
+}
+
+@DrawableRes
+fun getImageId(item: GridItem): Int {
+    // TODO: Implement getImageId
+    return if (item is GridItem.Piece && (item.facing == Direction.LEFT || item.facing == Direction.RIGHT)) {
+        R.drawable.snake_horizontal
+    } else {
+        R.drawable.snake_vertical
     }
 }

@@ -26,6 +26,7 @@ fun GridCell(
     dragAndDropState: DragAndDropState<GridItem.Piece>,
     position: Pair<Int, Int>,
     onItemDropped: (GridItem.Piece) -> Unit,
+    onItemRotated: (GridItem.Piece) -> Unit,
     modifier: Modifier = Modifier,
     item: GridItem? = null,
 ) {
@@ -80,6 +81,7 @@ fun GridCell(
                 ) {
                     GridCellItem(
                         item,
+                        onClick = { onItemRotated(item) },
                         modifier = Modifier
                             .graphicsLayer {
                                 alpha = if (isDragging) 0f else 1f
@@ -109,6 +111,7 @@ fun GridCellPreview() {
             position = Pair(0, 0),
             onItemDropped = {},
             item = piece,
+            onItemRotated = {},
             modifier = Modifier
                 .size(60.dp, 60.dp),
         )

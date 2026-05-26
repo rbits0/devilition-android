@@ -300,6 +300,8 @@ data class GameUiState(
             numAvailablePieces = numAvailablePieces,
         )
     }
+
+    fun canPlacePiece() = numAvailablePieces > 0
 }
 
 fun getEmptySpaces(grid: Array<Array<GridItem?>>): List<Pair<Int, Int>> {

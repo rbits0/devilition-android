@@ -72,6 +72,7 @@ fun GameScreen(
                     numAvailablePieces = gameUiState.numAvailablePieces,
                     dragAndDropState = dragAndDropState,
                     cellSize = cellSize,
+                    enabled = gameUiState.canPlacePiece(),
                     modifier = Modifier
                         .fillMaxWidth()
                 )

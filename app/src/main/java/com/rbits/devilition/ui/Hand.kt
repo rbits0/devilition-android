@@ -29,6 +29,7 @@ fun Hand(
     numAvailablePieces: Int,
     dragAndDropState: DragAndDropState<GridItem.Piece>,
     cellSize: Dp,
+    enabled: Boolean,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -57,6 +58,7 @@ fun Hand(
                         state = dragAndDropState,
                         key = item.id,
                         data = item,
+                        enabled = enabled,
                     ) {
                         GridCellItem(
                             item = item,
@@ -93,6 +95,7 @@ fun HandPreview() {
                 numAvailablePieces = 15,
                 dragAndDropState = rememberDragAndDropState(),
                 cellSize = 30.dp,
+                enabled = true,
                 modifier = Modifier
                     .fillMaxSize()
                 ,

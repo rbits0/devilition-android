@@ -233,6 +233,7 @@ data class GameUiState(
         var idCounter = idCounter
         var bag = bag
         var hand = hand
+        var numAvailablePieces = numAvailablePieces
 
         val from = item.position
         if (from == null) {
@@ -241,11 +242,17 @@ data class GameUiState(
         }
 
         when (from) {
+
             is PiecePos.GridPos -> {
+                // Move piece within grid
+
                 grid[from.x][from.y] = null
                 grid[to.x][to.y] = item.copy(position = to)
             }
+
             is PiecePos.HandPos -> {
+                // Place piece from hand
+
                 val newBag: MutableList<PieceType> = mutableListOf()
                 val newHand = hand.clone()
                 val id = idCounter
@@ -276,12 +283,13 @@ data class GameUiState(
                     )
 
                     grid[to.x][to.y] = item.copy(position = to)
-
                 }
 
+                numAvailablePieces -= 1
                 bag = newBag
                 hand = newHand
             }
+
         }
 
         return this.copy(
@@ -289,6 +297,7 @@ data class GameUiState(
             hand = hand,
             bag = bag,
             idCounter = idCounter,
+            numAvailablePieces = numAvailablePieces,
         )
     }
 }

@@ -6,8 +6,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -27,13 +29,22 @@ fun GridCell(
     modifier: Modifier = Modifier,
     item: GridItem? = null,
 ) {
+    var isHoveredOver by remember { mutableStateOf(false) }
+
+    // Can drop piece on this cell if this cell is empty
+    // OR if dragging piece back to the same cell
+    fun canDropPiece(draggedItem: GridItem.Piece) =
+        item == null
+        || (item is GridItem.Piece && draggedItem.id == item.id)
+
     val surfaceColor = if (item is GridItem.Hole || item is GridItem.BossHitbox) {
         Color.Transparent
+    } else if (isHoveredOver) {
+        MaterialTheme.colorScheme.primaryContainer
     } else {
         MaterialTheme.colorScheme.surfaceContainer
     }
 
-    val isHoveredOver = remember { mutableStateOf(false) }
 
     Surface(
         tonalElevation = 0.dp,
@@ -46,16 +57,17 @@ fun GridCell(
                 state = dragAndDropState,
                 key = position,
                 onDrop = { state ->
-                    if (item == null) {
+                    if (canDropPiece(state.data)) {
                         onItemDropped(state.data)
+                        isHoveredOver = false
                     }
                 },
-                onDragEnter = {
-                    if (item == null) {
-                        isHoveredOver.value = true
+                onDragEnter = { state ->
+                    if (canDropPiece(state.data)) {
+                        isHoveredOver = true
                     }
                 },
-                onDragExit = { isHoveredOver.value = false },
+                onDragExit = { isHoveredOver = false },
             ),
     ) {
         if (item != null) {

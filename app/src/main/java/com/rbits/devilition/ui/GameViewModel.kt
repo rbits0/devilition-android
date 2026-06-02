@@ -20,4 +20,8 @@ class GameViewModel : ViewModel() {
     fun rotatePiece(item: GridItem.Piece) {
         _uiState.update { it.rotatePiece(item) }
     }
+
+    fun confirmPlacement() {
+        _uiState.update { it.confirmPlacement() }
+    }
 }

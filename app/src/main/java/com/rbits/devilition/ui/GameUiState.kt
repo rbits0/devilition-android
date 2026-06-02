@@ -246,7 +246,7 @@ data class GameUiState(
         var bag = bag
         var hand = hand
         var numAvailablePieces = numAvailablePieces
-        var unplacedPiecePos = unconfirmedPiecePos
+        var unconfirmedPiecePos = unconfirmedPiecePos
 
         val from = item.position
         if (from == null) {
@@ -270,7 +270,7 @@ data class GameUiState(
                 val newHand = hand.clone()
                 val id = idCounter
                 idCounter++
-                unplacedPiecePos = to
+                unconfirmedPiecePos = to
 
                 if (item.type == PieceType.ROCKET) {
                     // Replace rocket with pad instead of drawing from bag
@@ -312,6 +312,7 @@ data class GameUiState(
             bag = bag,
             idCounter = idCounter,
             numAvailablePieces = numAvailablePieces,
+            unconfirmedPiecePos = unconfirmedPiecePos,
         )
     }
 

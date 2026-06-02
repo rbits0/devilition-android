@@ -66,6 +66,7 @@ sealed class GridItem {
         val type: PieceType,
         val facing: Direction,
         val id: Int,
+        val placementConfirmed: Boolean = false,
         val position: PiecePos? = null,
         val color: RocketColor = RocketColor.entries.random(),
         var rocketTargetId: Int? = null,
@@ -85,6 +86,9 @@ data class GameUiState(
     val round: Int = 0,
     val score: Int = 0,
     val idCounter: Int = 0,
+    // Position of the piece that has been dragged onto the board,
+    // but hasn't had placement confirmed
+    val unconfirmedPiecePos: PiecePos? = null,
 ) {
 
     companion object {
@@ -242,6 +246,7 @@ data class GameUiState(
         var bag = bag
         var hand = hand
         var numAvailablePieces = numAvailablePieces
+        var unplacedPiecePos = unconfirmedPiecePos
 
         val from = item.position
         if (from == null) {
@@ -265,6 +270,7 @@ data class GameUiState(
                 val newHand = hand.clone()
                 val id = idCounter
                 idCounter++
+                unplacedPiecePos = to
 
                 if (item.type == PieceType.ROCKET) {
                     // Replace rocket with pad instead of drawing from bag

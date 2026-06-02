@@ -48,13 +48,16 @@ sealed class PiecePos {
     data class HandPos(val pos: Int) : PiecePos()
 }
 
+// Item with a sprite
+sealed interface SpriteItem
+
 sealed class GridItem {
 
     data class Demon(
         val type: DemonType,
         val health: Int,
         val maxHealth: Int,
-    ) : GridItem()
+    ) : GridItem(), SpriteItem
 
     // Boss takes up a 2x2 space
     // If this item is hit, it should damage the boss
@@ -70,7 +73,7 @@ sealed class GridItem {
         val position: PiecePos? = null,
         val color: RocketColor = RocketColor.entries.random(),
         var rocketTargetId: Int? = null,
-    ) : GridItem()
+    ) : GridItem(), SpriteItem
 
     class Hole() : GridItem()
 

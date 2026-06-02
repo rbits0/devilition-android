@@ -78,6 +78,11 @@ fun GridCell(
                     key = item.id,
                     data = item,
                     enabled = true,
+                    draggableContent = { GridCellItem(
+                        item,
+                        onClick = {},
+                        isDragging = true,
+                    ) },
                 ) {
                     GridCellItem(
                         item,

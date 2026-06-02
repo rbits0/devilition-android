@@ -24,6 +24,7 @@ fun GridCellItem(
     item: GridItem,
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
+    isDragging: Boolean = false,
 ) {
     val surfaceColor = when (item) {
         is GridItem.Demon, is GridItem.Piece -> MaterialTheme.colorScheme.surfaceVariant
@@ -33,7 +34,10 @@ fun GridCellItem(
         is GridItem.Demon, is GridItem.Piece -> 2.dp
         is GridItem.Hole, is GridItem.BossHitbox -> 0.dp
     }
-    val border = if (item is GridItem.Piece && !item.placementConfirmed) {
+    val border = if (
+        isDragging
+        || (item is GridItem.Piece && !item.placementConfirmed)
+    ) {
         BorderStroke(
             width = 2.dp,
             brush = SolidColor(MaterialTheme.colorScheme.primary),

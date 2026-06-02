@@ -65,6 +65,11 @@ fun Hand(
                         key = item.id,
                         data = item,
                         enabled = enabled,
+                        draggableContent = { GridCellItem(
+                            item,
+                            onClick = {},
+                            isDragging = true,
+                        ) },
                     ) {
                         GridCellItem(
                             item = item,

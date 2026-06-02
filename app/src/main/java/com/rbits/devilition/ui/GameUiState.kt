@@ -66,7 +66,7 @@ sealed class GridItem {
         val type: PieceType,
         val facing: Direction,
         val id: Int,
-        val placementConfirmed: Boolean = false,
+        val placementConfirmed: Boolean = true,
         val position: PiecePos? = null,
         val color: RocketColor = RocketColor.entries.random(),
         var rocketTargetId: Int? = null,
@@ -269,7 +269,10 @@ data class GameUiState(
                 hand[from.pos] = null
                 unconfirmedPiecePos = to
 
-                grid[to.x][to.y] = item.copy(position = to)
+                grid[to.x][to.y] = item.copy(
+                    position = to,
+                    placementConfirmed = false,
+                )
             }
 
         }

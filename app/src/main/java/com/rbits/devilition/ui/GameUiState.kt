@@ -342,7 +342,9 @@ data class GameUiState(
         }
     }
 
-    fun canPlacePiece(): Boolean = numAvailablePieces > 0
+    fun canPlacePieceFromHand(): Boolean = (
+        numAvailablePieces > 0 && unconfirmedPiecePos == null
+    )
 }
 
 fun getEmptySpaces(grid: Array<Array<GridItem?>>): List<Pair<Int, Int>> {

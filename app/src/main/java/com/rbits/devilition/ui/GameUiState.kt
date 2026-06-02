@@ -80,7 +80,7 @@ sealed class GridItem {
 
 data class GameUiState(
     val grid: Array<Array<GridItem?>> = Array(GRID_HEIGHT) { Array(GRID_WIDTH) { null } },
-    val hand: Array<GridItem.Piece>,
+    val hand: Array<GridItem.Piece?>,
     val bag: List<PieceType> = listOf(),
     val numAvailablePieces: Int = 0,
     val round: Int = 0,
@@ -88,7 +88,7 @@ data class GameUiState(
     val idCounter: Int = 0,
     // Position of the piece that has been dragged onto the board,
     // but hasn't had placement confirmed
-    val unconfirmedPiecePos: PiecePos? = null,
+    val unconfirmedPiecePos: PiecePos.GridPos? = null,
 ) {
 
     companion object {
@@ -265,43 +265,11 @@ data class GameUiState(
 
             is PiecePos.HandPos -> {
                 // Place piece from hand
-
-                val newBag: MutableList<PieceType> = mutableListOf()
-                val newHand = hand.clone()
-                val id = idCounter
-                idCounter++
+                hand = hand.clone()
+                hand[from.pos] = null
                 unconfirmedPiecePos = to
 
-                if (item.type == PieceType.ROCKET) {
-                    // Replace rocket with pad instead of drawing from bag
-                    newHand[from.pos] = GridItem.Piece(
-                        type = PieceType.ROCKET_PAD,
-                        facing = Direction.DOWN,
-                        position = from,
-                        id = id,
-                        color = item.color,
-                    )
-
-                    grid[to.x][to.y] = item.copy(
-                        position = to,
-                        rocketTargetId = id,
-                    )
-                } else {
-                    // Draw piece from bag to replace moved piece
-                    val type = drawNewPiece(newBag)
-                    newHand[from.pos] = GridItem.Piece(
-                        type = type,
-                        facing = Direction.DOWN,
-                        id = id,
-                        position = from,
-                    )
-
-                    grid[to.x][to.y] = item.copy(position = to)
-                }
-
-                numAvailablePieces -= 1
-                bag = newBag
-                hand = newHand
+                grid[to.x][to.y] = item.copy(position = to)
             }
 
         }
@@ -340,6 +308,69 @@ data class GameUiState(
             null -> return this
 
         }
+    }
+
+    // Confirm piece, and draw new piece to replace empty spot in hand
+    fun confirmPlacement(): GameUiState {
+        if (unconfirmedPiecePos == null) {
+            return this
+        }
+
+        val grid = grid.map { it.clone() }.toTypedArray()
+        val hand = hand.clone()
+        val bag = bag.toMutableList()
+
+        val item = grid[unconfirmedPiecePos.x][unconfirmedPiecePos.y]
+        if (item == null || item !is GridItem.Piece) {
+            return this
+        }
+
+        val newPiecePos = PiecePos.HandPos(hand.indexOf(null))
+        val id = idCounter
+        val idCounter = idCounter + 1
+        val numAvailablePieces = numAvailablePieces - 1
+
+        if (item.type == PieceType.ROCKET) {
+            // Mark piece as confirmed
+            grid[unconfirmedPiecePos.x][unconfirmedPiecePos.y] = item.copy(
+                rocketTargetId = id,
+                placementConfirmed = true,
+            )
+
+            // Replace rocket with pad instead of drawing from bag
+            hand[newPiecePos.pos] = GridItem.Piece(
+                type = PieceType.ROCKET_PAD,
+                facing = Direction.DOWN,
+                position = newPiecePos,
+                id = id,
+                color = item.color,
+            )
+
+        } else {
+            // Mark piece as confirmed
+            grid[unconfirmedPiecePos.x][unconfirmedPiecePos.y] = item.copy(
+                rocketTargetId = id,
+                placementConfirmed = true,
+            )
+
+            // Draw piece from bag to replace moved piece
+            val type = drawNewPiece(bag)
+            hand[newPiecePos.pos] = GridItem.Piece(
+                type = type,
+                facing = Direction.DOWN,
+                id = id,
+                position = newPiecePos,
+            )
+        }
+
+        return this.copy(
+            grid = grid,
+            hand = hand,
+            bag = bag,
+            idCounter = idCounter,
+            numAvailablePieces = numAvailablePieces,
+            unconfirmedPiecePos = null,
+        )
     }
 
     fun canPlacePieceFromHand(): Boolean = (

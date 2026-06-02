@@ -25,7 +25,7 @@ import com.rbits.devilition.ui.theme.DevilitionTheme
 
 @Composable
 fun Hand(
-    handState: Array<GridItem.Piece>,
+    handState: Array<GridItem.Piece?>,
     numAvailablePieces: Int,
     dragAndDropState: DragAndDropState<GridItem.Piece>,
     cellSize: Dp,
@@ -54,7 +54,7 @@ fun Hand(
             Row(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                handState.forEach { item ->
+                handState.forEach { item -> if (item != null) {
                     DraggableItem(
                         state = dragAndDropState,
                         key = item.id,
@@ -71,7 +71,12 @@ fun Hand(
                                 }
                         )
                     }
-                }
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .size(cellSize)
+                    )
+                }}
             }
         }
     }

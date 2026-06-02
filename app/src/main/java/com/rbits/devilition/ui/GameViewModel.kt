@@ -24,4 +24,8 @@ class GameViewModel : ViewModel() {
     fun confirmPlacement() {
         _uiState.update { it.confirmPlacement() }
     }
+
+    fun cancelPlacement() {
+        _uiState.update { it.cancelPlacement() }
+    }
 }

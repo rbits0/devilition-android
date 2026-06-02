@@ -46,7 +46,8 @@ fun GridCell(
         MaterialTheme.colorScheme.surfaceContainer
     }
 
-    val isDraggable = item is GridItem.Piece && !item.placementConfirmed
+//    val isDraggable = item is GridItem.Piece && !item.placementConfirmed
+    val isDraggable = item is GridItem.Piece
 
 
     Surface(

@@ -80,6 +80,7 @@ fun GameScreen(
                         gameViewModel.rotatePiece(item)
                     },
                     onConfirmPlacement = { gameViewModel.confirmPlacement() },
+                    onCancelPlacement = { gameViewModel.cancelPlacement() },
                     modifier = Modifier
                         .fillMaxWidth()
                 )

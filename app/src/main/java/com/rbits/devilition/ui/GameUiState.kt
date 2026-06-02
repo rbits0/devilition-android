@@ -376,6 +376,37 @@ data class GameUiState(
         )
     }
 
+    fun cancelPlacement(): GameUiState {
+        val grid = grid.map { it.clone() }.toTypedArray()
+        val hand = hand.clone()
+
+        if (unconfirmedPiecePos == null) {
+            return this
+        }
+
+        val item = grid[unconfirmedPiecePos.x][unconfirmedPiecePos.y]
+        if (item == null || item !is GridItem.Piece) {
+            return this
+        }
+
+        val handEmptyPosition = PiecePos.HandPos(hand.indexOf(null))
+
+        // Remove piece from grid
+        grid[unconfirmedPiecePos.x][unconfirmedPiecePos.y] = null
+
+        // Place back in hand
+        hand[handEmptyPosition.pos] = item.copy(
+            position = handEmptyPosition,
+            placementConfirmed = true,
+        )
+
+        return this.copy(
+            grid = grid,
+            hand = hand,
+            unconfirmedPiecePos = null,
+        )
+    }
+
     fun canPlacePieceFromHand(): Boolean = (
         numAvailablePieces > 0 && unconfirmedPiecePos == null
     )

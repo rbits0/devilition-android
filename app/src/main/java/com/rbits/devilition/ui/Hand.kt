@@ -1,5 +1,6 @@
 package com.rbits.devilition.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,6 +37,7 @@ fun Hand(
     enabled: Boolean,
     onItemRotated: (GridItem.Piece) -> Unit,
     onConfirmPlacement: () -> Unit,
+    onCancelPlacement: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -89,11 +92,23 @@ fun Hand(
                 }}
             }
 
-            Button(
-                onClick = onConfirmPlacement,
-                modifier = Modifier.padding(top = 12.dp)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                modifier = Modifier.padding(top = 12.dp),
             ) {
-                Text(stringResource(R.string.confirm_placement))
+
+                OutlinedButton(
+                    onClick = onCancelPlacement,
+                ) {
+                    Text(stringResource(R.string.cancel_placement))
+                }
+
+                Button(
+                    onClick = onConfirmPlacement,
+                ) {
+                    Text(stringResource(R.string.confirm_placement))
+                }
+
             }
         }
     }
@@ -122,6 +137,7 @@ fun HandPreview() {
                 enabled = true,
                 onItemRotated = {},
                 onConfirmPlacement = {},
+                onCancelPlacement = {},
                 modifier = Modifier
                     .fillMaxSize()
                 ,

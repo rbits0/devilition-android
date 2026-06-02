@@ -2,4 +2,5 @@
     <string name="app_name">Devilition</string>
     <string name="snake">Snake</string>
     <string name="confirm_placement">Place</string>
+    <string name="cancel_placement">Cancel</string>
 </resources>

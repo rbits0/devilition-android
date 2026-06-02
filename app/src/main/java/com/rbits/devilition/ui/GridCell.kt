@@ -46,6 +46,8 @@ fun GridCell(
         MaterialTheme.colorScheme.surfaceContainer
     }
 
+    val isDraggable = item is GridItem.Piece && !item.placementConfirmed
+
 
     Surface(
         tonalElevation = 0.dp,
@@ -72,7 +74,7 @@ fun GridCell(
             ),
     ) {
         if (item != null) {
-            if (item is GridItem.Piece) {
+            if (isDraggable) {
                 DraggableItem(
                     state = dragAndDropState,
                     key = item.id,

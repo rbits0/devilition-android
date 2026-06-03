@@ -12,6 +12,7 @@ import com.rbits.devilition.data.piecesPerRound
 import com.rbits.devilition.data.tierPieces
 import kotlin.collections.component1
 import kotlin.collections.component2
+import kotlin.math.max
 
 enum class DemonType {
     MINOR,
@@ -56,6 +57,11 @@ sealed class PiecePos {
     data class HandPos(val pos: Int) : PiecePos()
 }
 
+sealed class ExplosionPos {
+    data class RelativePos(val x: Int, val y: Int) : ExplosionPos()
+    data class FixedPos(val x: Int, val y: Int) : ExplosionPos()
+}
+
 // Item with a sprite
 sealed interface SpriteItem
 
@@ -70,7 +76,7 @@ sealed class GridItem {
     // Boss takes up a 2x2 space
     // If this item is hit, it should damage the boss
     data class BossHitbox(
-        val bossPos: Pair<Int, Int>,
+        val bossPos: PiecePos.GridPos,
     ) : GridItem()
 
     data class Piece(
@@ -104,6 +110,7 @@ data class GameUiState(
     // Position of the piece that has been dragged onto the board,
     // but hasn't had placement confirmed
     var unconfirmedPiecePos: PiecePos.GridPos? = null,
+    var armedPieces: MutableSet<GridItem.Piece>? = null,
 ) {
 
     companion object {
@@ -270,7 +277,7 @@ data class GameUiState(
         )
         for (pos in listOf(Pair(4, 5), Pair(5, 4), Pair(5, 5))) {
             grid[pos.first][pos.second] = GridItem.BossHitbox(
-                bossPos = Pair(4, 4),
+                bossPos = PiecePos.GridPos(4, 4),
             )
         }
     }
@@ -399,6 +406,174 @@ data class GameUiState(
         this.unconfirmedPiecePos = null
     }
 
+    fun armPiece(item: GridItem.Piece) {
+        armedPieces = mutableSetOf(item)
+    }
+
+    fun runDetonationStep() {
+        val armedPieces = armedPieces?.toSet() ?: return
+        this.armedPieces?.clear()
+
+        for (item in armedPieces) {
+            detonatePiece(item)
+        }
+    }
+
+    private fun detonatePiece(item: GridItem.Piece) {
+        val cellsToExplode = getPieceTargetCells(item)
+
+        for (pos in cellsToExplode) {
+            explodeCell(pos)
+        }
+    }
+
+    fun getPieceTargetCells(item: GridItem.Piece): Set<PiecePos.GridPos> {
+        // Get the relative pos of cells to explode for piece facing up
+        val cellsToExplode = when (item.type) {
+            PieceType.ROCKET -> {
+                // Don't explode anything if the rocket can't be found
+                val targetId = item.rocketTargetId ?: return setOf()
+                val target = findPieceById(targetId)
+                target?.position?.let {
+                    if (it !is PiecePos.GridPos) return setOf()
+                    setOf(ExplosionPos.FixedPos(it.x, it.y))
+                } ?: return setOf()
+            }
+            PieceType.ROCKET_PAD -> {
+                setOf(
+                    ExplosionPos.RelativePos(-1, -1),
+                    ExplosionPos.RelativePos(-1, 0),
+                    ExplosionPos.RelativePos(-1, 1),
+                    ExplosionPos.RelativePos(0, -1),
+                    ExplosionPos.RelativePos(0, 1),
+                    ExplosionPos.RelativePos(1, -1),
+                    ExplosionPos.RelativePos(1, 0),
+                    ExplosionPos.RelativePos(1, 1),
+                )
+            }
+            PieceType.STRAWMAN -> {
+                setOf(
+                    ExplosionPos.RelativePos(-1, -1),
+                    ExplosionPos.RelativePos(-1, 0),
+                    ExplosionPos.RelativePos(-1, 1),
+                )
+            }
+            PieceType.TOAD -> {
+                setOf(
+                    ExplosionPos.RelativePos(-2, 0),
+                    ExplosionPos.RelativePos(2, 0),
+                    ExplosionPos.RelativePos(0, -2),
+                    ExplosionPos.RelativePos(0, 2),
+                )
+            }
+            PieceType.CANNON -> {
+                val gridSize = max(GRID_WIDTH, GRID_HEIGHT)
+                (-(gridSize - 1)..-1).map {
+                    ExplosionPos.RelativePos(it, 0)
+                }.toSet()
+            }
+            PieceType.BOMB -> {
+                setOf(
+                    ExplosionPos.RelativePos(-1, -1),
+                    ExplosionPos.RelativePos(-1, 0),
+                    ExplosionPos.RelativePos(-1, 1),
+                    ExplosionPos.RelativePos(0, -1),
+                    ExplosionPos.RelativePos(0, 1),
+                    ExplosionPos.RelativePos(1, -1),
+                    ExplosionPos.RelativePos(1, 0),
+                    ExplosionPos.RelativePos(1, 1),
+                )
+            }
+            PieceType.PLUS -> {
+                setOf(
+                    ExplosionPos.RelativePos(-1, 0),
+                    ExplosionPos.RelativePos(1, 0),
+                    ExplosionPos.RelativePos(0, -1),
+                    ExplosionPos.RelativePos(0, 1),
+                )
+            }
+            PieceType.CROSS -> {
+                setOf(
+                    ExplosionPos.RelativePos(-1, -1),
+                    ExplosionPos.RelativePos(-1, 1),
+                    ExplosionPos.RelativePos(1, -1),
+                    ExplosionPos.RelativePos(1, 1),
+                )
+            }
+            PieceType.SNAKE -> {
+                setOf(
+                    ExplosionPos.RelativePos(-1, 0),
+                    ExplosionPos.RelativePos(1, 0),
+                )
+            }
+        }
+
+        // Convert the relative cell positions to fixed GridPos
+        return cellsToExplode.mapTo(mutableSetOf()) { pos ->
+            when (pos) {
+                is ExplosionPos.RelativePos -> {
+                    val rotatedPos = rotatePos(pos, item.facing)
+                    if (item.position !is PiecePos.GridPos) return setOf()
+                    PiecePos.GridPos(
+                        item.position.x + rotatedPos.x,
+                        item.position.y + rotatedPos.y,
+                    )
+                }
+                is ExplosionPos.FixedPos -> PiecePos.GridPos(pos.x, pos.y)
+            }
+        }
+    }
+
+    private fun explodeCell(pos: PiecePos.GridPos) {
+        val item = grid[pos.x][pos.y]
+        when (item) {
+
+            is GridItem.Piece -> {
+                armedPieces!!.add(item)
+            }
+
+            is GridItem.Demon -> {
+                val newHealth = item.health - 1
+                if (newHealth == 0) {
+                    grid[pos.x][pos.y] = null
+                } else {
+                    grid[pos.x][pos.y] = item.copy(health = newHealth)
+                }
+            }
+
+            is GridItem.Townie -> {
+                grid[pos.x][pos.y] = null
+            }
+
+            is GridItem.BossHitbox -> {
+                // Find the boss demon
+                val boss = grid[item.bossPos.x][item.bossPos.y]
+                if (boss !is GridItem.Demon) return
+
+                // Damage the boss demon
+                val newHealth = boss.health - 1
+                if (newHealth == 0) {
+                    grid[item.bossPos.x][item.bossPos.y] = null
+                } else {
+                    grid[item.bossPos.x][item.bossPos.y] = boss.copy(health = newHealth)
+                }
+            }
+
+            is GridItem.Hole, null -> return
+
+        }
+    }
+
+    private fun findPieceById(id: Int): GridItem.Piece? {
+        val foundPieceList = grid.mapNotNull { row ->
+            row.find { item ->
+                item is GridItem.Piece && item.id == id
+            }
+        }
+
+        return foundPieceList.firstOrNull() as GridItem.Piece?
+    }
+
     fun placeRandomTownie() {
         val emptySpaces = getEmptySpaces(grid).toMutableSet()
         val pos = emptySpaces.random()
@@ -450,3 +625,13 @@ fun rotateClockwise(direction: Direction) =
         Direction.LEFT -> Direction.UP
     }
 
+// Rotate pos from facing up to the new direction, around (0, 0)
+fun rotatePos(
+    pos: ExplosionPos.RelativePos,
+    direction: Direction
+): ExplosionPos.RelativePos = when (direction) {
+    Direction.UP -> pos
+    Direction.DOWN -> ExplosionPos.RelativePos(-pos.x, -pos.y)
+    Direction.LEFT -> ExplosionPos.RelativePos(-pos.y, pos.x)
+    Direction.RIGHT -> ExplosionPos.RelativePos(pos.y, -pos.x)
+}

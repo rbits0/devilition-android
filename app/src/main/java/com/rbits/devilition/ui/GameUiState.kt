@@ -183,37 +183,10 @@ data class GameUiState(
         round += 1
 
         if (round < 10) {
-            // Heal all elder demons
-            grid.forEachIndexed { rowIndex, row ->
-                row.forEachIndexed { colIndex, item ->
-                    if (item is GridItem.Demon && item.type == DemonType.ELDER) {
-                        grid[rowIndex][colIndex] = item.copy(health = item.maxHealth)
-                    }
-                }
-            }
+            healDemons()
 
-            val emptySpaces = getEmptySpaces(grid).toMutableSet()
-
-            // Place hole
-            val holePos = emptySpaces.random()
-            emptySpaces.remove(holePos)
-            grid[holePos.x][holePos.y] = GridItem.Hole()
-
-            // Place demons
-            demonsPerRound(round).forEach { (demonType, count) ->
-                val health = demonTypeHealth(demonType)
-
-                // Place `count` demons of `demonType`
-                for (i in 0..<count) {
-                    val demonPos = emptySpaces.random()
-                    emptySpaces.remove(demonPos)
-                    grid[demonPos.x][demonPos.y] = GridItem.Demon(
-                        type = demonType,
-                        health = health,
-                        maxHealth = health,
-                    )
-                }
-            }
+            placeRandomHoles(count = 1)
+            placeDemons(round)
         } else {
             // FINAL ROUND
 
@@ -234,31 +207,72 @@ data class GameUiState(
                 }
             }
 
-            // Place boss in middle
-            // Boss takes up a 2x2 space
-            grid[4][4] = GridItem.Demon(
-                type = DemonType.BOSS,
-                health = demonTypeHealth(DemonType.BOSS),
-                maxHealth = demonTypeHealth(DemonType.BOSS),
-            )
-            for (pos in listOf(Pair(4, 5), Pair(5, 4), Pair(5, 5))) {
-                grid[pos.first][pos.second] = GridItem.BossHitbox(
-                    bossPos = Pair(4, 4),
-                )
-            }
+            placeBoss()
 
             // Place 2-4 holes
             // TODO: Check the specifics of how this is done in UFO 50
-            val emptySpaces = getEmptySpaces(grid).toMutableSet()
             val numHoles = (2..4).random()
-            for (i in 0..<numHoles) {
-                val holePos = emptySpaces.random()
-                emptySpaces.remove(holePos)
-                grid[holePos.x][holePos.y] = GridItem.Hole()
-            }
+            placeRandomHoles(numHoles)
         }
 
         numAvailablePieces += piecesPerRound(round)
+    }
+
+    // Heal all elder demons
+    fun healDemons() {
+        grid.forEachIndexed { rowIndex, row ->
+            row.forEachIndexed { colIndex, item ->
+                if (item is GridItem.Demon && item.type == DemonType.ELDER) {
+                    grid[rowIndex][colIndex] = item.copy(health = item.maxHealth)
+                }
+            }
+        }
+
+
+    }
+
+    fun placeRandomHoles(count: Int = 1) {
+        val emptySpaces = getEmptySpaces(grid).toMutableSet()
+
+        for (_i in 0..<count) {
+            val holePos = emptySpaces.random()
+            emptySpaces.remove(holePos)
+            grid[holePos.x][holePos.y] = GridItem.Hole()
+        }
+    }
+
+    fun placeDemons(round: Int) {
+        val emptySpaces = getEmptySpaces(grid).toMutableSet()
+
+        demonsPerRound(round).forEach { (demonType, count) ->
+            val health = demonTypeHealth(demonType)
+
+            // Place `count` demons of `demonType`
+            for (i in 0..<count) {
+                val demonPos = emptySpaces.random()
+                emptySpaces.remove(demonPos)
+                grid[demonPos.x][demonPos.y] = GridItem.Demon(
+                    type = demonType,
+                    health = health,
+                    maxHealth = health,
+                )
+            }
+        }
+    }
+
+    // Place boss in middle
+    // Boss takes up a 2x2 space
+    fun placeBoss() {
+        grid[4][4] = GridItem.Demon(
+            type = DemonType.BOSS,
+            health = demonTypeHealth(DemonType.BOSS),
+            maxHealth = demonTypeHealth(DemonType.BOSS),
+        )
+        for (pos in listOf(Pair(4, 5), Pair(5, 4), Pair(5, 5))) {
+            grid[pos.first][pos.second] = GridItem.BossHitbox(
+                bossPos = Pair(4, 4),
+            )
+        }
     }
 
     fun movePiece(item: GridItem.Piece, to: PiecePos.GridPos) {

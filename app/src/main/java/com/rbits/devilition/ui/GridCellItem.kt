@@ -37,14 +37,18 @@ fun GridCellItem(
     onClick: (() -> Unit)? = null,
     isDragging: Boolean = false,
 ) {
-    val surfaceColor = when (item) {
-        is GridItem.Demon, is GridItem.Piece -> MaterialTheme.colorScheme.surfaceVariant
-        is GridItem.Hole, is GridItem.BossHitbox -> Color.Transparent
+    val surfaceColor = if (item is SpriteItem) {
+        MaterialTheme.colorScheme.surfaceVariant
+    } else {
+        Color.Transparent
     }
-    val elevation = when (item) {
-        is GridItem.Demon, is GridItem.Piece -> 2.dp
-        is GridItem.Hole, is GridItem.BossHitbox -> 0.dp
+
+    val elevation = if (item is SpriteItem) {
+        2.dp
+    } else {
+        0.dp
     }
+
     val border = if (
         isDragging
         || (item is GridItem.Piece && !item.placementConfirmed)
@@ -142,6 +146,16 @@ fun getImageId(item: SpriteItem): Int = (
                 DemonType.BOSS -> R.drawable.demon_boss
             }
         }
+
+        is GridItem.Townie -> {
+            when(item.type) {
+                TownieType.MAN_1 -> R.drawable.townie_man
+                TownieType.MAN_2 -> R.drawable.townie_man_alt
+                TownieType.WOMAN_1 -> R.drawable.townie_woman
+                TownieType.WOMAN_2 -> R.drawable.townie_woman_alt
+            }
+        }
+
     }
 )
 

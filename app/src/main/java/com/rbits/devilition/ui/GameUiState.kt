@@ -5,6 +5,7 @@ import com.rbits.devilition.TAG
 import com.rbits.devilition.data.GRID_HEIGHT
 import com.rbits.devilition.data.GRID_WIDTH
 import com.rbits.devilition.data.HAND_SIZE
+import com.rbits.devilition.data.NUM_STARTING_TOWNIES
 import com.rbits.devilition.data.demonTypeHealth
 import com.rbits.devilition.data.demonsPerRound
 import com.rbits.devilition.data.piecesPerRound
@@ -29,6 +30,13 @@ enum class PieceType {
     ROCKET,
     ROCKET_PAD,
     CANNON,
+}
+
+enum class TownieType {
+    MAN_1,
+    MAN_2,
+    WOMAN_1,
+    WOMAN_2,
 }
 
 enum class RocketColor {
@@ -75,6 +83,10 @@ sealed class GridItem {
         var rocketTargetId: Int? = null,
     ) : GridItem(), SpriteItem
 
+    data class Townie(
+        val type: TownieType
+    ) : GridItem(), SpriteItem
+
     class Hole() : GridItem()
 
 }
@@ -115,11 +127,17 @@ data class GameUiState(
                 )
             }
 
-            return GameUiState(
+            val state = GameUiState(
                 hand = hand.toTypedArray(),
                 bag = bag,
                 idCounter = idCounter,
             )
+
+            for (_i in 0..<NUM_STARTING_TOWNIES) {
+                state.placeRandomTownie()
+            }
+
+            return state
         }
     }
 
@@ -365,6 +383,13 @@ data class GameUiState(
         )
 
         this.unconfirmedPiecePos = null
+    }
+
+    fun placeRandomTownie() {
+        val emptySpaces = getEmptySpaces(grid).toMutableSet()
+        val pos = emptySpaces.random()
+        val townieType = TownieType.entries.random()
+        grid[pos.x][pos.y] = GridItem.Townie(type = townieType)
     }
 
     fun canPlacePieceFromHand(): Boolean = (

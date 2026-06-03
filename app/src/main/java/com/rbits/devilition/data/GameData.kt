@@ -6,6 +6,7 @@ import com.rbits.devilition.ui.PieceType
 const val GRID_HEIGHT = 8
 const val GRID_WIDTH = 10
 const val HAND_SIZE = 3
+const val NUM_STARTING_TOWNIES = 2
 
 val tierPieces = mapOf(
     1 to listOf(PieceType.CANNON, PieceType.ROCKET, PieceType.BOMB),

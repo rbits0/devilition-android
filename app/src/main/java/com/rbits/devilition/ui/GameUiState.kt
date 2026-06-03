@@ -296,6 +296,11 @@ data class GameUiState(
 
                 grid[from.x][from.y] = null
                 grid[to.x][to.y] = item.copy(position = to)
+
+                // Update unconfirmedPiecePos
+                if (from == unconfirmedPiecePos) {
+                    unconfirmedPiecePos = to
+                }
             }
 
             is PiecePos.HandPos -> {

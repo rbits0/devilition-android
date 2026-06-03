@@ -366,7 +366,6 @@ data class GameUiState(
         } else {
             // Mark piece as confirmed
             grid[unconfirmedPiecePos.x][unconfirmedPiecePos.y] = item.copy(
-                rocketTargetId = id,
                 placementConfirmed = true,
             )
 

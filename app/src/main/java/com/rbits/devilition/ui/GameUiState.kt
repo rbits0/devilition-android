@@ -82,16 +82,16 @@ sealed class GridItem {
 
 
 data class GameUiState(
-    val grid: Array<Array<GridItem?>> = Array(GRID_HEIGHT) { Array(GRID_WIDTH) { null } },
-    val hand: Array<GridItem.Piece?>,
-    val bag: List<PieceType> = listOf(),
-    val numAvailablePieces: Int = 0,
-    val round: Int = 0,
-    val score: Int = 0,
-    val idCounter: Int = 0,
+    var grid: Array<Array<GridItem?>> = Array(GRID_HEIGHT) { Array(GRID_WIDTH) { null } },
+    var hand: Array<GridItem.Piece?>,
+    var bag: List<PieceType> = listOf(),
+    var numAvailablePieces: Int = 0,
+    var round: Int = 0,
+    var score: Int = 0,
+    var idCounter: Int = 0,
     // Position of the piece that has been dragged onto the board,
     // but hasn't had placement confirmed
-    val unconfirmedPiecePos: PiecePos.GridPos? = null,
+    var unconfirmedPiecePos: PiecePos.GridPos? = null,
 ) {
 
     companion object {
@@ -142,7 +142,6 @@ data class GameUiState(
 
         return true
     }
-
     // Auto-generated function to handle the array
     override fun hashCode(): Int {
         var result = numAvailablePieces
@@ -156,9 +155,14 @@ data class GameUiState(
         return result
     }
 
-    fun roundStart(): GameUiState {
-        val grid = grid.map{ it.clone() }.toTypedArray()
-        val round = round + 1
+
+    fun clone(): GameUiState = this.copy(
+        grid = grid.map{ it.clone() }.toTypedArray(),
+        hand = hand.clone(),
+    )
+
+    fun roundStart() {
+        round += 1
 
         if (round < 10) {
             // Heal all elder demons
@@ -236,27 +240,14 @@ data class GameUiState(
             }
         }
 
-        val numAvailablePieces = numAvailablePieces + piecesPerRound(round)
-
-        return this.copy(
-            grid = grid,
-            round = round,
-            numAvailablePieces = numAvailablePieces,
-        )
+        numAvailablePieces += piecesPerRound(round)
     }
 
-    fun movePiece(item: GridItem.Piece, to: PiecePos.GridPos): GameUiState {
-        val grid = grid.map { it.clone() }.toTypedArray()
-        var idCounter = idCounter
-        var bag = bag
-        var hand = hand
-        var numAvailablePieces = numAvailablePieces
-        var unconfirmedPiecePos = unconfirmedPiecePos
-
+    fun movePiece(item: GridItem.Piece, to: PiecePos.GridPos) {
         val from = item.position
         if (from == null) {
             Log.e(TAG, "Piece position is null")
-            return this
+            return
         }
 
         when (from) {
@@ -270,7 +261,6 @@ data class GameUiState(
 
             is PiecePos.HandPos -> {
                 // Place piece from hand
-                hand = hand.clone()
                 hand[from.pos] = null
                 unconfirmedPiecePos = to
 
@@ -281,62 +271,41 @@ data class GameUiState(
             }
 
         }
-
-        return this.copy(
-            grid = grid,
-            hand = hand,
-            bag = bag,
-            idCounter = idCounter,
-            numAvailablePieces = numAvailablePieces,
-            unconfirmedPiecePos = unconfirmedPiecePos,
-        )
     }
 
-    fun rotatePiece(item: GridItem.Piece): GameUiState {
+    fun rotatePiece(item: GridItem.Piece) {
         when (val pos = item.position) {
 
             is PiecePos.GridPos -> {
-                val grid = grid.map{ it.clone() }.toTypedArray()
                 grid[pos.x][pos.y] = item.copy(
                     facing = rotateClockwise(item.facing)
                 )
-
-                return this.copy(grid = grid)
             }
 
             is PiecePos.HandPos -> {
-                val hand = hand.clone()
                 hand[pos.pos] = item.copy(
                     facing = rotateClockwise(item.facing)
                 )
-
-                return this.copy(hand = hand)
             }
 
-            null -> return this
+            null -> {}
 
         }
     }
 
     // Confirm piece, and draw new piece to replace empty spot in hand
-    fun confirmPlacement(): GameUiState {
-        if (unconfirmedPiecePos == null) {
-            return this
-        }
-
-        val grid = grid.map { it.clone() }.toTypedArray()
-        val hand = hand.clone()
-        val bag = bag.toMutableList()
+    fun confirmPlacement() {
+        val unconfirmedPiecePos = this.unconfirmedPiecePos ?: return
 
         val item = grid[unconfirmedPiecePos.x][unconfirmedPiecePos.y]
         if (item == null || item !is GridItem.Piece) {
-            return this
+            return
         }
 
         val newPiecePos = PiecePos.HandPos(hand.indexOf(null))
         val id = idCounter
-        val idCounter = idCounter + 1
-        val numAvailablePieces = numAvailablePieces - 1
+        idCounter += 1
+        numAvailablePieces -= 1
 
         if (item.type == PieceType.ROCKET) {
             // Mark piece as confirmed
@@ -362,36 +331,26 @@ data class GameUiState(
             )
 
             // Draw piece from bag to replace moved piece
-            val type = drawNewPiece(bag)
+            val newBag = bag.toMutableList()
+            val type = drawNewPiece(newBag)
             hand[newPiecePos.pos] = GridItem.Piece(
                 type = type,
                 facing = Direction.DOWN,
                 id = id,
                 position = newPiecePos,
             )
+            bag = newBag
         }
 
-        return this.copy(
-            grid = grid,
-            hand = hand,
-            bag = bag,
-            idCounter = idCounter,
-            numAvailablePieces = numAvailablePieces,
-            unconfirmedPiecePos = null,
-        )
+        this.unconfirmedPiecePos = null
     }
 
-    fun cancelPlacement(): GameUiState {
-        val grid = grid.map { it.clone() }.toTypedArray()
-        val hand = hand.clone()
-
-        if (unconfirmedPiecePos == null) {
-            return this
-        }
+    fun cancelPlacement() {
+        val unconfirmedPiecePos = unconfirmedPiecePos ?: return
 
         val item = grid[unconfirmedPiecePos.x][unconfirmedPiecePos.y]
         if (item == null || item !is GridItem.Piece) {
-            return this
+            return
         }
 
         val handEmptyPosition = PiecePos.HandPos(hand.indexOf(null))
@@ -405,11 +364,7 @@ data class GameUiState(
             placementConfirmed = true,
         )
 
-        return this.copy(
-            grid = grid,
-            hand = hand,
-            unconfirmedPiecePos = null,
-        )
+        this.unconfirmedPiecePos = null
     }
 
     fun canPlacePieceFromHand(): Boolean = (

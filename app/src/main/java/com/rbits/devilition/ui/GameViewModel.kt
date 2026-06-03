@@ -10,22 +10,42 @@ class GameViewModel : ViewModel() {
     val uiState = _uiState.asStateFlow()
 
     fun roundStart() {
-        _uiState.update { it.roundStart() }
+        _uiState.update {
+            val newValue = it.clone()
+            newValue.roundStart()
+            newValue
+        }
     }
 
     fun movePiece(item: GridItem.Piece, to: PiecePos.GridPos) {
-        _uiState.update { it.movePiece(item, to) }
+        _uiState.update {
+            val newValue = it.clone()
+            newValue.movePiece(item, to)
+            newValue
+        }
     }
 
     fun rotatePiece(item: GridItem.Piece) {
-        _uiState.update { it.rotatePiece(item) }
+        _uiState.update {
+            val newValue = it.clone()
+            newValue.rotatePiece(item)
+            newValue
+        }
     }
 
     fun confirmPlacement() {
-        _uiState.update { it.confirmPlacement() }
+        _uiState.update {
+            val newValue = it.clone()
+            newValue.confirmPlacement()
+            newValue
+        }
     }
 
     fun cancelPlacement() {
-        _uiState.update { it.cancelPlacement() }
+        _uiState.update {
+            val newValue = it.clone()
+            newValue.cancelPlacement()
+            newValue
+        }
     }
 }

@@ -338,6 +338,7 @@ data class GameUiState(
 
         val item = grid[unconfirmedPiecePos.x][unconfirmedPiecePos.y]
         if (item == null || item !is GridItem.Piece) {
+            Log.e(TAG, "Can't confirm placement. unconfirmedPiecePos does not point to a valid piece")
             return
         }
 

@@ -77,6 +77,7 @@ fun Hand(
                         GridCellItem(
                             item = item,
                             onClick = { onItemRotated(item) },
+                            rotationEnabled = true,
                             modifier = Modifier
                                 .size(cellSize)
                                 .graphicsLayer {

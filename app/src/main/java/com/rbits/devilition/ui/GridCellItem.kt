@@ -35,6 +35,7 @@ fun GridCellItem(
     item: GridItem,
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
+    rotationEnabled: Boolean = false,
     isDragging: Boolean = false,
 ) {
     val surfaceColor = if (item is SpriteItem) {
@@ -67,6 +68,7 @@ fun GridCellItem(
         color = surfaceColor,
         shape = RoundedCornerShape(6.dp),
         onClick = { onClick?.invoke() },
+        enabled = rotationEnabled,
         border = border,
         modifier = modifier
             .aspectRatio(1f),

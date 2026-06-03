@@ -90,6 +90,7 @@ fun GridCell(
                     GridCellItem(
                         item,
                         onClick = { onItemRotated(item) },
+                        rotationEnabled = !item.placementConfirmed,
                         modifier = Modifier
                             .graphicsLayer {
                                 alpha = if (isDragging) 0f else 1f

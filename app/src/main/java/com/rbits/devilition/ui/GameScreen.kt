@@ -75,7 +75,8 @@ fun GameScreen(
                     numAvailablePieces = gameUiState.numAvailablePieces,
                     dragAndDropState = dragAndDropState,
                     cellSize = cellSize,
-                    enabled = gameUiState.canPlacePieceFromHand(),
+                    dragEnabled = gameUiState.canPlacePieceFromHand(),
+                    confirmEnabled = gameUiState.unconfirmedPiecePos != null,
                     onItemRotated = { item ->
                         gameViewModel.rotatePiece(item)
                     },

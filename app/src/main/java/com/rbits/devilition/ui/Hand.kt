@@ -1,6 +1,5 @@
 package com.rbits.devilition.ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,7 +33,8 @@ fun Hand(
     numAvailablePieces: Int,
     dragAndDropState: DragAndDropState<GridItem.Piece>,
     cellSize: Dp,
-    enabled: Boolean,
+    dragEnabled: Boolean,
+    confirmEnabled: Boolean,
     onItemRotated: (GridItem.Piece) -> Unit,
     onConfirmPlacement: () -> Unit,
     onCancelPlacement: () -> Unit,
@@ -67,7 +67,7 @@ fun Hand(
                         state = dragAndDropState,
                         key = item.id,
                         data = item,
-                        enabled = enabled,
+                        enabled = dragEnabled,
                         draggableContent = { GridCellItem(
                             item,
                             onClick = {},
@@ -99,12 +99,14 @@ fun Hand(
 
                 OutlinedButton(
                     onClick = onCancelPlacement,
+                    enabled = confirmEnabled,
                 ) {
                     Text(stringResource(R.string.cancel_placement))
                 }
 
                 Button(
                     onClick = onConfirmPlacement,
+                    enabled = confirmEnabled,
                 ) {
                     Text(stringResource(R.string.confirm_placement))
                 }
@@ -134,7 +136,8 @@ fun HandPreview() {
                 numAvailablePieces = 15,
                 dragAndDropState = rememberDragAndDropState(),
                 cellSize = 30.dp,
-                enabled = true,
+                dragEnabled = true,
+                confirmEnabled = true,
                 onItemRotated = {},
                 onConfirmPlacement = {},
                 onCancelPlacement = {},

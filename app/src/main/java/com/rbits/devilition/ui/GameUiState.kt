@@ -179,7 +179,7 @@ data class GameUiState(
             // Place hole
             val holePos = emptySpaces.random()
             emptySpaces.remove(holePos)
-            grid[holePos.first][holePos.second] = GridItem.Hole()
+            grid[holePos.x][holePos.y] = GridItem.Hole()
 
             // Place demons
             demonsPerRound(round).forEach { (demonType, count) ->
@@ -189,7 +189,7 @@ data class GameUiState(
                 for (i in 0..<count) {
                     val demonPos = emptySpaces.random()
                     emptySpaces.remove(demonPos)
-                    grid[demonPos.first][demonPos.second] = GridItem.Demon(
+                    grid[demonPos.x][demonPos.y] = GridItem.Demon(
                         type = demonType,
                         health = health,
                         maxHealth = health,
@@ -236,7 +236,7 @@ data class GameUiState(
             for (i in 0..<numHoles) {
                 val holePos = emptySpaces.random()
                 emptySpaces.remove(holePos)
-                grid[holePos.first][holePos.second] = GridItem.Hole()
+                grid[holePos.x][holePos.y] = GridItem.Hole()
             }
         }
 
@@ -372,10 +372,12 @@ data class GameUiState(
     )
 }
 
-fun getEmptySpaces(grid: Array<Array<GridItem?>>): List<Pair<Int, Int>> {
+fun getEmptySpaces(grid: Array<Array<GridItem?>>): List<PiecePos.GridPos> {
     return grid.flatMapIndexed { rowIndex, row ->
         row.mapIndexedNotNull { colIndex, item ->
-            if (item == null) Pair(rowIndex, colIndex) else null
+            if (item == null) {
+                PiecePos.GridPos(rowIndex, colIndex)
+            } else null
         }
     }
 }

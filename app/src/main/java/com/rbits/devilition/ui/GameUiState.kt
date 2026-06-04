@@ -144,6 +144,7 @@ data class GameUiState(
                 state.placeRandomTownie()
             }
 
+            state.roundStart()
             return state
         }
     }

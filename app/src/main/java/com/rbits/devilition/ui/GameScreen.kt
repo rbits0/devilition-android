@@ -33,9 +33,6 @@ fun GameScreen(
     val gameUiState by gameViewModel.uiState.collectAsState()
     val dragAndDropState = rememberDragAndDropState<GridItem.Piece>()
 
-    gameViewModel.roundStart()
-
-
     DragAndDropContainer(
         state = dragAndDropState,
         modifier = modifier.fillMaxSize()

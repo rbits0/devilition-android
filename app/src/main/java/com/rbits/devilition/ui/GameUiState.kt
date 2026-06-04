@@ -110,7 +110,7 @@ data class GameUiState(
     // Position of the piece that has been dragged onto the board,
     // but hasn't had placement confirmed
     var unconfirmedPiecePos: PiecePos.GridPos? = null,
-    var armedPieces: MutableSet<GridItem.Piece>? = null,
+    var armedPieces: MutableSet<GridItem.Piece> = mutableSetOf(),
 ) {
 
     companion object {
@@ -417,8 +417,8 @@ data class GameUiState(
     }
 
     fun runDetonationStep() {
-        val armedPieces = armedPieces?.toSet() ?: return
-        this.armedPieces?.clear()
+        val armedPieces = armedPieces.toSet()
+        this.armedPieces.clear()
 
         for (item in armedPieces) {
             detonatePiece(item)
@@ -426,6 +426,13 @@ data class GameUiState(
     }
 
     private fun detonatePiece(item: GridItem.Piece) {
+        if (item.position !is PiecePos.GridPos) {
+            Log.e(TAG, "Can't detonate piece: Invalid position")
+            return
+        }
+
+        grid[item.position.x][item.position.y] = null
+
         val cellsToExplode = getPieceTargetCells(item)
 
         for (pos in cellsToExplode) {
@@ -515,7 +522,7 @@ data class GameUiState(
         }
 
         // Convert the relative cell positions to fixed GridPos
-        return cellsToExplode.mapTo(mutableSetOf()) { pos ->
+        val gridCellsToExplode = cellsToExplode.mapTo(mutableSetOf()) { pos ->
             when (pos) {
                 is ExplosionPos.RelativePos -> {
                     val rotatedPos = rotatePos(pos, item.facing)
@@ -528,6 +535,12 @@ data class GameUiState(
                 is ExplosionPos.FixedPos -> PiecePos.GridPos(pos.x, pos.y)
             }
         }
+
+        // Remove any out of bounds position
+        return gridCellsToExplode.filterTo(mutableSetOf()){ pos ->
+            pos.x in 0..<GRID_HEIGHT
+                && pos.y in 0..<GRID_WIDTH
+        }
     }
 
     private fun explodeCell(pos: PiecePos.GridPos) {
@@ -535,7 +548,7 @@ data class GameUiState(
         when (item) {
 
             is GridItem.Piece -> {
-                armedPieces!!.add(item)
+                armedPieces.add(item)
             }
 
             is GridItem.Demon -> {
@@ -590,7 +603,7 @@ data class GameUiState(
     fun canPlacePieceFromHand(): Boolean = (
         numAvailablePieces > 0
             && unconfirmedPiecePos == null
-            && armedPieces == null
+            && armedPieces.isEmpty()
     )
 }
 

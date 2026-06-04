@@ -48,4 +48,20 @@ class GameViewModel : ViewModel() {
             newValue
         }
     }
+
+    fun armPiece(item: GridItem.Piece) {
+        _uiState.update {
+            val newValue = it.clone()
+            newValue.armPiece(item)
+            newValue
+        }
+    }
+
+    fun runDetonationStep() {
+        _uiState.update {
+            val newValue = it.clone()
+            newValue.runDetonationStep()
+            newValue
+        }
+    }
 }

@@ -165,6 +165,7 @@ data class GameUiState(
         if (!hand.contentEquals(other.hand)) return false
         if (bag != other.bag) return false
         if (unconfirmedPiecePos != other.unconfirmedPiecePos) return false
+        if (armedPieces != other.armedPieces) return false
 
         return true
     }
@@ -178,6 +179,7 @@ data class GameUiState(
         result = 31 * result + hand.contentHashCode()
         result = 31 * result + bag.hashCode()
         result = 31 * result + (unconfirmedPiecePos?.hashCode() ?: 0)
+        result = 31 * result + armedPieces.hashCode()
         return result
     }
 

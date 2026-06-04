@@ -15,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,14 +26,18 @@ import com.mohamedrejeb.compose.dnd.rememberDragAndDropState
 import com.rbits.devilition.data.GRID_HEIGHT
 import com.rbits.devilition.data.GRID_WIDTH
 import com.rbits.devilition.ui.theme.DevilitionTheme
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 const val GRID_SPACING_DP = 2
+const val DETONATION_STEP_TIME_MS = 1000L
 
 @Composable
 fun GameScreen(
     modifier: Modifier = Modifier,
     gameViewModel: GameViewModel = viewModel(),
 ) {
+    val scope = rememberCoroutineScope()
     val gameUiState by gameViewModel.uiState.collectAsState()
     val dragAndDropState = rememberDragAndDropState<GridItem.Piece>()
     var detonateStarted by remember { mutableStateOf(false) }
@@ -43,6 +48,20 @@ fun GameScreen(
             selectedForDetonation = item
         } else {
             gameViewModel.rotatePiece(item)
+        }
+    }
+
+    fun onDetonate() {
+        val selected = selectedForDetonation ?: return
+        selectedForDetonation = null
+        detonateStarted = false
+        gameViewModel.armPiece(selected)
+
+        scope.launch {
+            while (gameUiState.armedPieces.isNotEmpty()) {
+                delay(DETONATION_STEP_TIME_MS)
+                gameViewModel.runDetonationStep()
+            }
         }
     }
 
@@ -85,7 +104,10 @@ fun GameScreen(
                     numAvailablePieces = gameUiState.numAvailablePieces,
                     dragAndDropState = dragAndDropState,
                     cellSize = cellSize,
-                    dragEnabled = gameUiState.canPlacePieceFromHand(),
+                    dragEnabled = (
+                        gameUiState.canPlacePieceFromHand()
+                            && (!detonateStarted)
+                    ),
                     confirmEnabled = gameUiState.unconfirmedPiecePos != null,
                     startDetonateEnabled = gameUiState.unconfirmedPiecePos == null,
                     detonateStarted = detonateStarted,
@@ -98,7 +120,7 @@ fun GameScreen(
                     onStartDetonate = {
                         detonateStarted = true
                     },
-                    onConfirmDetonate = { /* TODO: */ },
+                    onConfirmDetonate = { onDetonate() },
                     onCancelDetonate = {
                         detonateStarted = false
                         selectedForDetonation = null

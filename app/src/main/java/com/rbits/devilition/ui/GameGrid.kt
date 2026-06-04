@@ -21,8 +21,10 @@ import com.rbits.devilition.ui.theme.DevilitionTheme
 fun GameGrid(
     gridState: Array<Array<GridItem?>>,
     dragAndDropState: DragAndDropState<GridItem.Piece>,
+    detonateStarted: Boolean,
+    selectedForDetonation: GridItem.Piece?,
     onItemDropped: (GridItem.Piece, PiecePos.GridPos) -> Unit,
-    onItemRotated: (GridItem.Piece) -> Unit,
+    onItemClicked: (GridItem.Piece) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -41,10 +43,12 @@ fun GameGrid(
                         dragAndDropState,
                         position = Pair(rowIndex, colIndex),
                         item = item,
+                        detonateStarted = detonateStarted,
+                        selectedForDetonation = item == selectedForDetonation,
                         onItemDropped = { item ->
                             onItemDropped(item, PiecePos.GridPos(rowIndex, colIndex))
                         },
-                        onItemRotated = onItemRotated,
+                        onItemClicked = onItemClicked,
                         modifier = Modifier
                             .weight(1f),
                     )
@@ -83,8 +87,10 @@ fun GameGridPreview() {
             GameGrid(
                 gridState,
                 rememberDragAndDropState(),
+                detonateStarted = false,
+                selectedForDetonation = null,
                 onItemDropped = {_, _ -> },
-                onItemRotated = {},
+                onItemClicked = {},
                 modifier = Modifier,
             )
         }

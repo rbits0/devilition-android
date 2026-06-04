@@ -13,6 +13,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -32,6 +35,16 @@ fun GameScreen(
 ) {
     val gameUiState by gameViewModel.uiState.collectAsState()
     val dragAndDropState = rememberDragAndDropState<GridItem.Piece>()
+    var detonateStarted by remember { mutableStateOf(false) }
+    var selectedForDetonation: GridItem.Piece? by remember { mutableStateOf(null) }
+
+    fun onItemClicked(item: GridItem.Piece) {
+        if (detonateStarted) {
+            selectedForDetonation = item
+        } else {
+            gameViewModel.rotatePiece(item)
+        }
+    }
 
     DragAndDropContainer(
         state = dragAndDropState,
@@ -62,9 +75,9 @@ fun GameScreen(
                     onItemDropped = { item, position ->
                         gameViewModel.movePiece(item, position)
                     },
-                    onItemRotated = { item ->
-                        gameViewModel.rotatePiece(item)
-                    },
+                    detonateStarted = detonateStarted,
+                    selectedForDetonation = selectedForDetonation,
+                    onItemClicked = { onItemClicked(it) },
                 )
 
                 Hand(
@@ -74,11 +87,22 @@ fun GameScreen(
                     cellSize = cellSize,
                     dragEnabled = gameUiState.canPlacePieceFromHand(),
                     confirmEnabled = gameUiState.unconfirmedPiecePos != null,
+                    startDetonateEnabled = gameUiState.unconfirmedPiecePos == null,
+                    detonateStarted = detonateStarted,
+                    confirmDetonateEnabled = selectedForDetonation != null,
                     onItemRotated = { item ->
                         gameViewModel.rotatePiece(item)
                     },
                     onConfirmPlacement = { gameViewModel.confirmPlacement() },
                     onCancelPlacement = { gameViewModel.cancelPlacement() },
+                    onStartDetonate = {
+                        detonateStarted = true
+                    },
+                    onConfirmDetonate = { /* TODO: */ },
+                    onCancelDetonate = {
+                        detonateStarted = false
+                        selectedForDetonation = null
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                 )

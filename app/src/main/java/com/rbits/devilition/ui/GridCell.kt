@@ -25,8 +25,10 @@ import com.rbits.devilition.ui.theme.DevilitionTheme
 fun GridCell(
     dragAndDropState: DragAndDropState<GridItem.Piece>,
     position: Pair<Int, Int>,
+    detonateStarted: Boolean,
+    selectedForDetonation: Boolean,
     onItemDropped: (GridItem.Piece) -> Unit,
-    onItemRotated: (GridItem.Piece) -> Unit,
+    onItemClicked: (GridItem.Piece) -> Unit,
     modifier: Modifier = Modifier,
     item: GridItem? = null,
 ) {
@@ -46,9 +48,7 @@ fun GridCell(
         MaterialTheme.colorScheme.surfaceContainer
     }
 
-//    val isDraggable = item is GridItem.Piece && !item.placementConfirmed
-    val isDraggable = item is GridItem.Piece
-
+    val isDraggable = item is GridItem.Piece && !item.placementConfirmed
 
     Surface(
         tonalElevation = 0.dp,
@@ -76,28 +76,41 @@ fun GridCell(
     ) {
         if (item != null) {
             if (isDraggable) {
+                // Draggable piece
                 DraggableItem(
                     state = dragAndDropState,
                     key = item.id,
                     data = item,
                     enabled = true,
-                    draggableContent = { GridCellItem(
-                        item,
-                        onClick = {},
-                        isDragging = true,
-                    ) },
+                    draggableContent = {
+                        GridCellItem(
+                            item,
+                            onClick = {},
+                            isDragging = true,
+                        )
+                    },
                 ) {
                     GridCellItem(
                         item,
-                        onClick = { onItemRotated(item) },
-                        rotationEnabled = !item.placementConfirmed,
+                        onClick = { onItemClicked(item) },
+                        clickEnabled = true,
+                        highlighted = true,
                         modifier = Modifier
                             .graphicsLayer {
                                 alpha = if (isDragging) 0f else 1f
                             }
                     )
                 }
+            } else if (item is GridItem.Piece) {
+                // Non-draggable piece
+                GridCellItem(
+                    item,
+                    onClick = { onItemClicked(item) },
+                    clickEnabled = detonateStarted,
+                    highlighted = selectedForDetonation
+                )
             } else {
+                // Non-piece
                 GridCellItem(item)
             }
         }
@@ -120,7 +133,9 @@ fun GridCellPreview() {
             position = Pair(0, 0),
             onItemDropped = {},
             item = piece,
-            onItemRotated = {},
+            onItemClicked = {},
+            selectedForDetonation = false,
+            detonateStarted = false,
             modifier = Modifier
                 .size(60.dp, 60.dp),
         )

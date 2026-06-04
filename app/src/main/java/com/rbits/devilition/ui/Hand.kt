@@ -35,9 +35,15 @@ fun Hand(
     cellSize: Dp,
     dragEnabled: Boolean,
     confirmEnabled: Boolean,
+    startDetonateEnabled: Boolean,
+    detonateStarted: Boolean,
+    confirmDetonateEnabled: Boolean,
     onItemRotated: (GridItem.Piece) -> Unit,
     onConfirmPlacement: () -> Unit,
     onCancelPlacement: () -> Unit,
+    onStartDetonate: () -> Unit,
+    onConfirmDetonate: () -> Unit,
+    onCancelDetonate: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -77,7 +83,7 @@ fun Hand(
                         GridCellItem(
                             item = item,
                             onClick = { onItemRotated(item) },
-                            rotationEnabled = true,
+                            clickEnabled = true,
                             modifier = Modifier
                                 .size(cellSize)
                                 .graphicsLayer {
@@ -93,26 +99,57 @@ fun Hand(
                 }}
             }
 
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                modifier = Modifier.padding(top = 12.dp),
-            ) {
-
-                OutlinedButton(
-                    onClick = onCancelPlacement,
-                    enabled = confirmEnabled,
+            if (!detonateStarted) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.padding(top = 12.dp),
                 ) {
-                    Text(stringResource(R.string.cancel_placement))
+
+                    OutlinedButton(
+                        onClick = onCancelPlacement,
+                        enabled = confirmEnabled,
+                    ) {
+                        Text(stringResource(R.string.cancel_placement))
+                    }
+
+                    Button(
+                        onClick = onConfirmPlacement,
+                        enabled = confirmEnabled,
+                    ) {
+                        Text(stringResource(R.string.confirm_placement))
+                    }
+
                 }
 
                 Button(
-                    onClick = onConfirmPlacement,
-                    enabled = confirmEnabled,
+                    onClick = { onStartDetonate() },
+                    enabled = startDetonateEnabled,
                 ) {
-                    Text(stringResource(R.string.confirm_placement))
+                    Text(stringResource(R.string.start_detonate))
                 }
+            } else {
+                // Detonate started
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.padding(top = 12.dp),
+                ) {
 
+                    OutlinedButton(
+                        onClick = { onCancelDetonate() },
+                    ) {
+                        Text(stringResource(R.string.cancel_detonate))
+                    }
+
+                    Button(
+                        onClick = onConfirmDetonate,
+                        enabled = confirmDetonateEnabled,
+                    ) {
+                        Text(stringResource(R.string.confirm_detonate))
+                    }
+
+                }
             }
+
         }
     }
 }
@@ -139,9 +176,15 @@ fun HandPreview() {
                 cellSize = 30.dp,
                 dragEnabled = true,
                 confirmEnabled = true,
+                startDetonateEnabled = true,
+                detonateStarted = false,
+                confirmDetonateEnabled = true,
                 onItemRotated = {},
                 onConfirmPlacement = {},
                 onCancelPlacement = {},
+                onStartDetonate = {},
+                onConfirmDetonate = {},
+                onCancelDetonate = {},
                 modifier = Modifier
                     .fillMaxSize()
                 ,

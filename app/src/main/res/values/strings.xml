@@ -3,4 +3,7 @@
     <string name="snake">Snake</string>
     <string name="confirm_placement">Place</string>
     <string name="cancel_placement">Cancel</string>
+    <string name="start_detonate">Detonate</string>
+    <string name="confirm_detonate">Confirm</string>
+    <string name="cancel_detonate">Cancel</string>
 </resources>

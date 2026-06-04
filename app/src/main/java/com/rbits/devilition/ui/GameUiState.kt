@@ -588,7 +588,9 @@ data class GameUiState(
     }
 
     fun canPlacePieceFromHand(): Boolean = (
-        numAvailablePieces > 0 && unconfirmedPiecePos == null
+        numAvailablePieces > 0
+            && unconfirmedPiecePos == null
+            && armedPieces == null
     )
 }
 

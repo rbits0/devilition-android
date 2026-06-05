@@ -109,7 +109,7 @@ data class GameUiState(
     var idCounter: Int = 0,
     // Position of the piece that has been dragged onto the board,
     // but hasn't had placement confirmed
-    var unconfirmedPiecePos: PiecePos.GridPos? = null,
+    var unconfirmedPiece: GridItem.Piece? = null,
     var armedPieces: MutableSet<GridItem.Piece> = mutableSetOf(),
 ) {
 
@@ -164,7 +164,7 @@ data class GameUiState(
         if (!grid.contentDeepEquals(other.grid)) return false
         if (!hand.contentEquals(other.hand)) return false
         if (bag != other.bag) return false
-        if (unconfirmedPiecePos != other.unconfirmedPiecePos) return false
+        if (unconfirmedPiece != other.unconfirmedPiece) return false
         if (armedPieces != other.armedPieces) return false
 
         return true
@@ -178,7 +178,7 @@ data class GameUiState(
         result = 31 * result + grid.contentDeepHashCode()
         result = 31 * result + hand.contentHashCode()
         result = 31 * result + bag.hashCode()
-        result = 31 * result + (unconfirmedPiecePos?.hashCode() ?: 0)
+        result = 31 * result + (unconfirmedPiece?.hashCode() ?: 0)
         result = 31 * result + armedPieces.hashCode()
         return result
     }
@@ -296,25 +296,27 @@ data class GameUiState(
 
             is PiecePos.GridPos -> {
                 // Move piece within grid
+                val newItem = item.copy(position = to)
 
                 grid[from.x][from.y] = null
-                grid[to.x][to.y] = item.copy(position = to)
+                grid[to.x][to.y] = newItem
 
-                // Update unconfirmedPiecePos
-                if (from == unconfirmedPiecePos) {
-                    unconfirmedPiecePos = to
+                // Update unconfirmedPiece
+                if (unconfirmedPiece == item) {
+                    unconfirmedPiece = newItem
                 }
             }
 
             is PiecePos.HandPos -> {
                 // Place piece from hand
-                hand[from.pos] = null
-                unconfirmedPiecePos = to
-
-                grid[to.x][to.y] = item.copy(
+                val newItem = item.copy(
                     position = to,
                     placementConfirmed = false,
                 )
+                hand[from.pos] = null
+                unconfirmedPiece = newItem
+
+                grid[to.x][to.y] = newItem
             }
 
         }
@@ -342,11 +344,10 @@ data class GameUiState(
 
     // Confirm piece, and draw new piece to replace empty spot in hand
     fun confirmPlacement() {
-        val unconfirmedPiecePos = this.unconfirmedPiecePos ?: return
-
-        val item = grid[unconfirmedPiecePos.x][unconfirmedPiecePos.y]
-        if (item == null || item !is GridItem.Piece) {
-            Log.e(TAG, "Can't confirm placement. unconfirmedPiecePos does not point to a valid piece")
+        val unconfirmedPiece = this.unconfirmedPiece ?: return
+        val position = unconfirmedPiece.position
+        if (position !is PiecePos.GridPos) {
+            Log.e(TAG, "Unable to place piece: Invalid position")
             return
         }
 
@@ -355,9 +356,9 @@ data class GameUiState(
         idCounter += 1
         numAvailablePieces -= 1
 
-        if (item.type == PieceType.ROCKET) {
+        if (unconfirmedPiece.type == PieceType.ROCKET) {
             // Mark piece as confirmed
-            grid[unconfirmedPiecePos.x][unconfirmedPiecePos.y] = item.copy(
+            grid[position.x][position.y] = unconfirmedPiece.copy(
                 rocketTargetId = id,
                 placementConfirmed = true,
             )
@@ -368,12 +369,12 @@ data class GameUiState(
                 facing = Direction.DOWN,
                 position = newPiecePos,
                 id = id,
-                color = item.color,
+                color = unconfirmedPiece.color,
             )
 
         } else {
             // Mark piece as confirmed
-            grid[unconfirmedPiecePos.x][unconfirmedPiecePos.y] = item.copy(
+            grid[position.x][position.y] = unconfirmedPiece.copy(
                 placementConfirmed = true,
             )
 
@@ -389,29 +390,30 @@ data class GameUiState(
             bag = newBag
         }
 
-        this.unconfirmedPiecePos = null
+        this.unconfirmedPiece = null
     }
 
     fun cancelPlacement() {
-        val unconfirmedPiecePos = unconfirmedPiecePos ?: return
+        val unconfirmedPiece= unconfirmedPiece ?: return
+        val position = unconfirmedPiece.position
 
-        val item = grid[unconfirmedPiecePos.x][unconfirmedPiecePos.y]
-        if (item == null || item !is GridItem.Piece) {
+        if (position !is PiecePos.GridPos) {
+            Log.e(TAG, "Unable to cancel placement: Invalid position")
             return
         }
 
         val handEmptyPosition = PiecePos.HandPos(hand.indexOf(null))
 
         // Remove piece from grid
-        grid[unconfirmedPiecePos.x][unconfirmedPiecePos.y] = null
+        grid[position.x][position.y] = null
 
         // Place back in hand
-        hand[handEmptyPosition.pos] = item.copy(
+        hand[handEmptyPosition.pos] = unconfirmedPiece.copy(
             position = handEmptyPosition,
             placementConfirmed = true,
         )
 
-        this.unconfirmedPiecePos = null
+        this.unconfirmedPiece = null
     }
 
     fun armPiece(item: GridItem.Piece) {
@@ -604,7 +606,7 @@ data class GameUiState(
 
     fun canPlacePieceFromHand(): Boolean = (
         numAvailablePieces > 0
-            && unconfirmedPiecePos == null
+            && unconfirmedPiece == null
             && armedPieces.isEmpty()
     )
 }

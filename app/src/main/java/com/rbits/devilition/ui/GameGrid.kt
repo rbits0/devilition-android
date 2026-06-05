@@ -26,6 +26,7 @@ fun GameGrid(
     onItemDropped: (GridItem.Piece, PiecePos.GridPos) -> Unit,
     onItemClicked: (GridItem.Piece) -> Unit,
     modifier: Modifier = Modifier,
+    targetedCells: Set<PiecePos.GridPos>? = null,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(GRID_SPACING_DP.dp),
@@ -41,7 +42,7 @@ fun GameGrid(
                 row.withIndex().forEach { (colIndex, item) ->
                     GridCell(
                         dragAndDropState,
-                        position = Pair(rowIndex, colIndex),
+                        position = PiecePos.GridPos(rowIndex, colIndex),
                         item = item,
                         detonateStarted = detonateStarted,
                         selectedForDetonation = item == selectedForDetonation,
@@ -49,6 +50,10 @@ fun GameGrid(
                             onItemDropped(item, PiecePos.GridPos(rowIndex, colIndex))
                         },
                         onItemClicked = onItemClicked,
+                        targeted = (
+                            targetedCells?.contains(PiecePos.GridPos(rowIndex, colIndex))
+                                ?: false
+                        ),
                         modifier = Modifier
                             .weight(1f),
                     )

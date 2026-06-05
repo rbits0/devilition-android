@@ -31,9 +31,11 @@ fun GridCellItem(
     onClick: (() -> Unit)? = null,
     clickEnabled: Boolean = false,
     highlighted: Boolean = false,
-    isDragging: Boolean = false,
+    targeted: Boolean = false
 ) {
-    val surfaceColor = if (item is SpriteItem) {
+    val surfaceColor = if (targeted) {
+        MaterialTheme.colorScheme.tertiary
+    } else if (item is SpriteItem) {
         MaterialTheme.colorScheme.surfaceVariant
     } else {
         Color.Transparent

@@ -24,13 +24,14 @@ import com.rbits.devilition.ui.theme.DevilitionTheme
 @Composable
 fun GridCell(
     dragAndDropState: DragAndDropState<GridItem.Piece>,
-    position: Pair<Int, Int>,
+    position: PiecePos.GridPos,
     detonateStarted: Boolean,
     selectedForDetonation: Boolean,
     onItemDropped: (GridItem.Piece) -> Unit,
     onItemClicked: (GridItem.Piece) -> Unit,
     modifier: Modifier = Modifier,
     item: GridItem? = null,
+    targeted: Boolean = false,
 ) {
     var isHoveredOver by remember { mutableStateOf(false) }
 
@@ -42,6 +43,8 @@ fun GridCell(
 
     val surfaceColor = if (item is GridItem.Hole || item is GridItem.BossHitbox) {
         Color.Transparent
+    } else if (targeted) {
+        MaterialTheme.colorScheme.tertiary
     } else if (isHoveredOver) {
         MaterialTheme.colorScheme.primaryContainer
     } else {
@@ -74,7 +77,7 @@ fun GridCell(
                 onDragExit = { isHoveredOver = false },
             ),
     ) {
-        if (item != null) {
+        if (item != null && item !is GridItem.Hole) {
             if (isDraggable) {
                 // Draggable piece
                 DraggableItem(
@@ -86,7 +89,7 @@ fun GridCell(
                         GridCellItem(
                             item,
                             onClick = {},
-                            isDragging = true,
+                            highlighted = true,
                         )
                     },
                 ) {
@@ -95,6 +98,7 @@ fun GridCell(
                         onClick = { onItemClicked(item) },
                         clickEnabled = true,
                         highlighted = true,
+                        targeted = targeted,
                         modifier = Modifier
                             .graphicsLayer {
                                 alpha = if (isDragging) 0f else 1f
@@ -107,11 +111,15 @@ fun GridCell(
                     item,
                     onClick = { onItemClicked(item) },
                     clickEnabled = detonateStarted,
-                    highlighted = selectedForDetonation
+                    highlighted = selectedForDetonation,
+                    targeted = targeted,
                 )
             } else {
                 // Non-piece
-                GridCellItem(item)
+                GridCellItem(
+                    item,
+                    targeted = targeted,
+                )
             }
         }
     }
@@ -130,7 +138,7 @@ fun GridCellPreview() {
     DevilitionTheme(darkTheme = true) {
         GridCell(
             rememberDragAndDropState(),
-            position = Pair(0, 0),
+            position = PiecePos.GridPos(0, 0),
             onItemDropped = {},
             item = piece,
             onItemClicked = {},

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +43,26 @@ fun GameScreen(
     val dragAndDropState = rememberDragAndDropState<GridItem.Piece>()
     var detonateStarted by remember { mutableStateOf(false) }
     var selectedForDetonation: GridItem.Piece? by remember { mutableStateOf(null) }
+
+    val targetedCells by remember(
+        dragAndDropState.draggedItem?.data,
+        dragAndDropState.hoveredDropTargetKey,
+        gameUiState.unconfirmedPiece,
+    ) { derivedStateOf {
+        val draggedItem = dragAndDropState.draggedItem?.data
+        val position = dragAndDropState.hoveredDropTargetKey
+        val unconfirmedPiece= gameUiState.unconfirmedPiece
+
+        if (draggedItem != null && position is PiecePos.GridPos) {
+            gameUiState.getPieceTargetCells(
+                draggedItem.copy(position = (position))
+            )
+        } else if (unconfirmedPiece != null) {
+            gameUiState.getPieceTargetCells(unconfirmedPiece)
+        } else {
+            null
+        }
+    } }
 
     fun onItemClicked(item: GridItem.Piece) {
         if (detonateStarted) {
@@ -96,6 +117,7 @@ fun GameScreen(
                     },
                     detonateStarted = detonateStarted,
                     selectedForDetonation = selectedForDetonation,
+                    targetedCells = targetedCells,
                     onItemClicked = { onItemClicked(it) },
                 )
 
@@ -108,8 +130,8 @@ fun GameScreen(
                         gameUiState.canPlacePieceFromHand()
                             && (!detonateStarted)
                     ),
-                    confirmEnabled = gameUiState.unconfirmedPiecePos != null,
-                    startDetonateEnabled = gameUiState.unconfirmedPiecePos == null,
+                    confirmEnabled = gameUiState.unconfirmedPiece!= null,
+                    startDetonateEnabled = gameUiState.unconfirmedPiece== null,
                     detonateStarted = detonateStarted,
                     confirmDetonateEnabled = selectedForDetonation != null,
                     onItemRotated = { item ->

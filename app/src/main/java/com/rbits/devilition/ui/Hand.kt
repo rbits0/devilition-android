@@ -77,13 +77,14 @@ fun Hand(
                         draggableContent = { GridCellItem(
                             item,
                             onClick = {},
-                            isDragging = true,
+                            highlighted = true,
                         ) },
                     ) {
                         GridCellItem(
                             item = item,
                             onClick = { onItemRotated(item) },
                             clickEnabled = true,
+                            highlighted = true,
                             modifier = Modifier
                                 .size(cellSize)
                                 .graphicsLayer {

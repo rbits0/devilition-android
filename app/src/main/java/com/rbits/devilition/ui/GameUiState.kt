@@ -340,9 +340,14 @@ data class GameUiState(
         when (val pos = item.position) {
 
             is PiecePos.GridPos -> {
-                grid[pos.x][pos.y] = item.copy(
+                val newItem = item.copy(
                     facing = rotateClockwise(item.facing)
                 )
+                grid[pos.x][pos.y] = newItem
+
+                if (unconfirmedPiece == item) {
+                    unconfirmedPiece = newItem
+                }
             }
 
             is PiecePos.HandPos -> {

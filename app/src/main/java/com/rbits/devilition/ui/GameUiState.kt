@@ -52,6 +52,14 @@ enum class Direction {
     RIGHT,
 }
 
+enum class GameStage {
+    ROUND_START,
+    PLACING_PIECES,
+    DETONATION,
+    ROUND_END,
+    GAME_OVER,
+}
+
 sealed class PiecePos {
     data class GridPos(val x: Int, val y: Int) : PiecePos()
     data class HandPos(val pos: Int) : PiecePos()
@@ -111,6 +119,8 @@ data class GameUiState(
     // but hasn't had placement confirmed
     var unconfirmedPiece: GridItem.Piece? = null,
     var armedPieces: MutableSet<GridItem.Piece> = mutableSetOf(),
+    // stage refers to what actions are about to happen or are happening.
+    var stage: GameStage = GameStage.ROUND_START,
 ) {
 
     companion object {
@@ -166,6 +176,7 @@ data class GameUiState(
         if (bag != other.bag) return false
         if (unconfirmedPiece != other.unconfirmedPiece) return false
         if (armedPieces != other.armedPieces) return false
+        if (stage != other.stage) return false
 
         return true
     }
@@ -180,6 +191,7 @@ data class GameUiState(
         result = 31 * result + bag.hashCode()
         result = 31 * result + (unconfirmedPiece?.hashCode() ?: 0)
         result = 31 * result + armedPieces.hashCode()
+        result = 31 * result + stage.hashCode()
         return result
     }
 
@@ -226,6 +238,7 @@ data class GameUiState(
         }
 
         numAvailablePieces += piecesPerRound(round)
+        stage = GameStage.PLACING_PIECES
     }
 
     // Heal all elder demons
@@ -418,11 +431,20 @@ data class GameUiState(
 
     fun armPiece(item: GridItem.Piece) {
         armedPieces = mutableSetOf(item)
+
+        // Set stage to detonation
+        // It might already be set, doesn't matter
+        stage = GameStage.DETONATION
     }
 
     fun runDetonationStep() {
         val armedPieces = armedPieces.toSet()
         this.armedPieces.clear()
+
+        if (armedPieces.isEmpty()) {
+            stage = GameStage.ROUND_END
+            return
+        }
 
         for (item in armedPieces) {
             detonatePiece(item)
@@ -607,7 +629,7 @@ data class GameUiState(
     fun canPlacePieceFromHand(): Boolean = (
         numAvailablePieces > 0
             && unconfirmedPiece == null
-            && armedPieces.isEmpty()
+            && stage == GameStage.PLACING_PIECES
     )
 }
 

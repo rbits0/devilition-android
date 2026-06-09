@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -79,7 +80,7 @@ fun GameScreen(
         gameViewModel.armPiece(selected)
 
         scope.launch {
-            while (gameUiState.armedPieces.isNotEmpty()) {
+            while (gameUiState.stage == GameStage.DETONATION) {
                 delay(DETONATION_STEP_TIME_MS)
                 gameViewModel.runDetonationStep()
             }
@@ -150,6 +151,8 @@ fun GameScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                 )
+
+                Text(gameUiState.stage.toString())
             }
         }
     }

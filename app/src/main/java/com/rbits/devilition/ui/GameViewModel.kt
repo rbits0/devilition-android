@@ -72,4 +72,10 @@ class GameViewModel : ViewModel() {
             newValue
         }
     }
+
+    fun reset() {
+        _uiState.update {
+            GameUiState.new()
+        }
+    }
 }

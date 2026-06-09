@@ -6,4 +6,6 @@
     <string name="start_detonate">Detonate</string>
     <string name="confirm_detonate">Confirm</string>
     <string name="cancel_detonate">Cancel</string>
+    <string name="close_dialog">Ok</string>
+    <string name="lose">You lose</string>
 </resources>

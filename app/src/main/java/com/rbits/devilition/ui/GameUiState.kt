@@ -57,7 +57,8 @@ enum class GameStage {
     PLACING_PIECES,
     DETONATION,
     ROUND_END,
-    GAME_OVER,
+    WIN,
+    LOSE,
 }
 
 sealed class PiecePos {
@@ -449,6 +450,22 @@ data class GameUiState(
         for (item in armedPieces) {
             detonatePiece(item)
         }
+    }
+
+    fun roundEnd() {
+        val numDemons = grid.flatten().count { it is GridItem.Demon }
+        val numTownies = grid.flatten().count { it is GridItem.Townie }
+
+        if (numDemons > numTownies) {
+            stage = GameStage.LOSE
+            return
+        }
+
+        if (numDemons == 0) {
+            placeRandomTownie()
+        }
+
+        stage = GameStage.ROUND_START
     }
 
     private fun detonatePiece(item: GridItem.Piece) {

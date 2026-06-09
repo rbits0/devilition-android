@@ -84,6 +84,12 @@ fun GameScreen(
                 delay(DETONATION_STEP_TIME_MS)
                 gameViewModel.runDetonationStep()
             }
+
+            gameViewModel.roundEnd()
+            if (gameUiState.stage == GameStage.ROUND_START) {
+                delay(DETONATION_STEP_TIME_MS)
+                gameViewModel.roundStart()
+            }
         }
     }
 
@@ -151,8 +157,6 @@ fun GameScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                 )
-
-                Text(gameUiState.stage.toString())
             }
         }
     }

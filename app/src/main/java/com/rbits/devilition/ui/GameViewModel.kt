@@ -64,4 +64,12 @@ class GameViewModel : ViewModel() {
             newValue
         }
     }
+
+    fun roundEnd() {
+        _uiState.update {
+            val newValue = it.clone()
+            newValue.roundEnd()
+            newValue
+        }
+    }
 }

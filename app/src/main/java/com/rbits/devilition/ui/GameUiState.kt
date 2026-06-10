@@ -473,6 +473,16 @@ data class GameUiState(
         stage = GameStage.ROUND_START
     }
 
+    fun calculateScore() {
+        score = 10_000
+        val numPiecesAndTownies = grid.flatten().count {
+            it is GridItem.Piece || it is GridItem.Townie
+        }
+        score += (numPiecesAndTownies + numAvailablePieces) * 1_000
+
+        // TODO: Time bonus
+    }
+
     private fun detonatePiece(item: GridItem.Piece) {
         if (item.position !is PiecePos.GridPos) {
             Log.e(TAG, "Can't detonate piece: Invalid position")

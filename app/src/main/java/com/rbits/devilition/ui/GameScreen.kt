@@ -26,7 +26,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mohamedrejeb.compose.dnd.DragAndDropContainer
 import com.mohamedrejeb.compose.dnd.rememberDragAndDropState
 import com.rbits.devilition.R
-import com.rbits.devilition.TAG
 import com.rbits.devilition.data.GRID_HEIGHT
 import com.rbits.devilition.data.GRID_WIDTH
 import com.rbits.devilition.ui.theme.DevilitionTheme
@@ -79,7 +78,8 @@ fun GameScreen(
         val selected = selectedForDetonation ?: return
         selectedForDetonation = null
         detonateStarted = false
-        gameViewModel.armPiece(selected)
+        // gameUiState doesn't immediately update, so this keeps the up-to-date value
+        var currentState = gameViewModel.armPiece(selected)
 
         scope.launch {
             while (currentState.stage == GameStage.DETONATION) {
@@ -166,7 +166,12 @@ fun GameScreen(
                 if (gameUiState.stage == GameStage.LOSE) {
                     WinLoseDialog(
                         onDismiss = { gameViewModel.reset() },
-                        text = stringResource(R.string.lose),
+                        text = stringResource(R.string.lose, gameUiState.score),
+                    )
+                } else if (gameUiState.stage == GameStage.WIN) {
+                    WinLoseDialog(
+                        onDismiss = { gameViewModel.reset() },
+                        text = stringResource(R.string.win, gameUiState.score),
                     )
                 }
             }

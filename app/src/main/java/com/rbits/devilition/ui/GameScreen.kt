@@ -82,15 +82,18 @@ fun GameScreen(
         gameViewModel.armPiece(selected)
 
         scope.launch {
-            while (gameUiState.stage == GameStage.DETONATION) {
+            while (currentState.stage == GameStage.DETONATION) {
                 delay(DETONATION_STEP_TIME_MS)
-                gameViewModel.runDetonationStep()
+                currentState = gameViewModel.runDetonationStep()
             }
 
-            gameViewModel.roundEnd()
-            if (gameUiState.stage == GameStage.ROUND_START) {
+            // gameUiState doesn't update immediately
+            currentState = gameViewModel.roundEnd()
+            if (currentState.stage == GameStage.ROUND_START) {
                 delay(DETONATION_STEP_TIME_MS)
                 gameViewModel.roundStart()
+            } else {
+                gameViewModel.calculateScore()
             }
         }
     }

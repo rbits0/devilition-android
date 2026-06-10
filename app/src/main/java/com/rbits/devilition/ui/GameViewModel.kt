@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.updateAndGet
 
 class GameViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(GameUiState.new())
@@ -49,26 +50,34 @@ class GameViewModel : ViewModel() {
         }
     }
 
-    fun armPiece(item: GridItem.Piece) {
-        _uiState.update {
+    fun armPiece(item: GridItem.Piece): GameUiState {
+        return _uiState.updateAndGet {
             val newValue = it.clone()
             newValue.armPiece(item)
             newValue
         }
     }
 
-    fun runDetonationStep() {
-        _uiState.update {
+    fun runDetonationStep(): GameUiState {
+        return _uiState.updateAndGet {
             val newValue = it.clone()
             newValue.runDetonationStep()
             newValue
         }
     }
 
-    fun roundEnd() {
-        _uiState.update {
+    fun roundEnd(): GameUiState {
+        return _uiState.updateAndGet {
             val newValue = it.clone()
             newValue.roundEnd()
+            newValue
+        }
+    }
+
+    fun calculateScore() {
+        _uiState.update {
+            val newValue = it.clone()
+            newValue.calculateScore()
             newValue
         }
     }

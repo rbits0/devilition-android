@@ -1,6 +1,8 @@
 package com.rbits.devilition.ui
 
 import android.util.Log
+import androidx.datastore.core.CorruptionException
+import androidx.datastore.core.Serializer
 import com.rbits.devilition.TAG
 import com.rbits.devilition.data.GRID_HEIGHT
 import com.rbits.devilition.data.GRID_WIDTH
@@ -11,6 +13,13 @@ import com.rbits.devilition.data.demonTypeHealth
 import com.rbits.devilition.data.demonsPerRound
 import com.rbits.devilition.data.piecesPerRound
 import com.rbits.devilition.data.tierPieces
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.Json
+import java.io.InputStream
+import java.io.OutputStream
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.math.max
@@ -62,35 +71,45 @@ enum class GameStage {
     LOSE,
 }
 
+@Serializable
 sealed class PiecePos {
+    @Serializable
     data class GridPos(val x: Int, val y: Int) : PiecePos()
+    @Serializable
     data class HandPos(val pos: Int) : PiecePos()
 }
 
+@Serializable
 sealed class ExplosionPos {
+    @Serializable
     data class RelativePos(val x: Int, val y: Int) : ExplosionPos()
+    @Serializable
     data class FixedPos(val x: Int, val y: Int) : ExplosionPos()
 }
 
 // Item with a sprite
 sealed interface SpriteItem
 
+@Serializable
 sealed class GridItem {
 
+    @Serializable
     data class Demon(
-        val type: DemonType,
+        val demonType: DemonType,
         val health: Int,
         val maxHealth: Int,
     ) : GridItem(), SpriteItem
 
     // Boss takes up a 2x2 space
     // If this item is hit, it should damage the boss
+    @Serializable
     data class BossHitbox(
         val bossPos: PiecePos.GridPos,
     ) : GridItem()
 
+    @Serializable
     data class Piece(
-        val type: PieceType,
+        val pieceType: PieceType,
         val facing: Direction,
         val id: Int,
         val placementConfirmed: Boolean = true,
@@ -99,19 +118,22 @@ sealed class GridItem {
         var rocketTargetId: Int? = null,
     ) : GridItem(), SpriteItem
 
+    @Serializable
     data class Townie(
-        val type: TownieType
+        val townieType: TownieType
     ) : GridItem(), SpriteItem
 
+    @Serializable
     class Hole() : GridItem()
 
 }
 
 
 
+@Serializable
 data class GameUiState(
     var grid: Array<Array<GridItem?>> = Array(GRID_HEIGHT) { Array(GRID_WIDTH) { null } },
-    var hand: Array<GridItem.Piece?>,
+    var hand: Array<GridItem.Piece?> = Array(HAND_SIZE) { null },
     var bag: List<PieceType> = listOf(),
     var numAvailablePieces: Int = 0,
     var round: Int = 0,
@@ -138,7 +160,7 @@ data class GameUiState(
                 idCounter++
                 hand.add(
                     GridItem.Piece(
-                        type = type,
+                        pieceType = type,
                         facing = Direction.DOWN,
                         id = id,
                         position = PiecePos.HandPos(i),
@@ -247,7 +269,7 @@ data class GameUiState(
     fun healDemons() {
         grid.forEachIndexed { rowIndex, row ->
             row.forEachIndexed { colIndex, item ->
-                if (item is GridItem.Demon && item.type == DemonType.ELDER) {
+                if (item is GridItem.Demon && item.demonType == DemonType.ELDER) {
                     grid[rowIndex][colIndex] = item.copy(health = item.maxHealth)
                 }
             }
@@ -277,7 +299,7 @@ data class GameUiState(
                 val demonPos = emptySpaces.random()
                 emptySpaces.remove(demonPos)
                 grid[demonPos.x][demonPos.y] = GridItem.Demon(
-                    type = demonType,
+                    demonType = demonType,
                     health = health,
                     maxHealth = health,
                 )
@@ -289,7 +311,7 @@ data class GameUiState(
     // Boss takes up a 2x2 space
     fun placeBoss() {
         grid[4][4] = GridItem.Demon(
-            type = DemonType.BOSS,
+            demonType = DemonType.BOSS,
             health = demonTypeHealth(DemonType.BOSS),
             maxHealth = demonTypeHealth(DemonType.BOSS),
         )
@@ -376,7 +398,7 @@ data class GameUiState(
         idCounter += 1
         numAvailablePieces -= 1
 
-        if (unconfirmedPiece.type == PieceType.ROCKET) {
+        if (unconfirmedPiece.pieceType == PieceType.ROCKET) {
             // Mark piece as confirmed
             grid[position.x][position.y] = unconfirmedPiece.copy(
                 rocketTargetId = id,
@@ -385,7 +407,7 @@ data class GameUiState(
 
             // Replace rocket with pad instead of drawing from bag
             hand[newPiecePos.pos] = GridItem.Piece(
-                type = PieceType.ROCKET_PAD,
+                pieceType = PieceType.ROCKET_PAD,
                 facing = Direction.DOWN,
                 position = newPiecePos,
                 id = id,
@@ -402,7 +424,7 @@ data class GameUiState(
             val newBag = bag.toMutableList()
             val type = drawNewPiece(newBag)
             hand[newPiecePos.pos] = GridItem.Piece(
-                type = type,
+                pieceType = type,
                 facing = Direction.DOWN,
                 id = id,
                 position = newPiecePos,
@@ -506,7 +528,7 @@ data class GameUiState(
 
     fun getPieceTargetCells(item: GridItem.Piece): Set<PiecePos.GridPos> {
         // Get the relative pos of cells to explode for piece facing up
-        val cellsToExplode = when (item.type) {
+        val cellsToExplode = when (item.pieceType) {
             PieceType.ROCKET -> {
                 // Don't explode anything if the rocket can't be found
                 val targetId = item.rocketTargetId ?: return setOf()
@@ -661,7 +683,7 @@ data class GameUiState(
         val emptySpaces = getEmptySpaces(grid).toMutableSet()
         val pos = emptySpaces.random()
         val townieType = TownieType.entries.random()
-        grid[pos.x][pos.y] = GridItem.Townie(type = townieType)
+        grid[pos.x][pos.y] = GridItem.Townie(townieType = townieType)
     }
 
     fun canPlacePieceFromHand(): Boolean = (
@@ -669,6 +691,28 @@ data class GameUiState(
             && unconfirmedPiece == null
             && stage == GameStage.PLACING_PIECES
     )
+}
+
+object GameUiStateSerializer : Serializer<GameUiState> {
+    override val defaultValue = GameUiState.new()
+
+    override suspend fun readFrom(input: InputStream) =
+        try {
+            Json.decodeFromString<GameUiState>(
+                input.readBytes().decodeToString()
+            )
+        } catch (serialization: SerializationException) {
+            throw CorruptionException("Unable to read GameUiState", serialization)
+        }
+
+    override suspend fun writeTo(t: GameUiState, output: OutputStream) {
+        withContext(Dispatchers.IO) {
+            output.write(
+                Json.encodeToString(t)
+                    .encodeToByteArray()
+            )
+        }
+    }
 }
 
 fun getEmptySpaces(grid: Array<Array<GridItem?>>): List<PiecePos.GridPos> {

@@ -38,10 +38,10 @@ const val DETONATION_STEP_TIME_MS = 1000L
 @Composable
 fun GameScreen(
     modifier: Modifier = Modifier,
-    gameViewModel: GameViewModel = viewModel(),
+    gameViewModel: GameViewModel,
 ) {
     val scope = rememberCoroutineScope()
-    val gameUiState by gameViewModel.uiState.collectAsState()
+    val gameUiState by gameViewModel.gameUiState.collectAsState()
     val dragAndDropState = rememberDragAndDropState<GridItem.Piece>()
     var detonateStarted by remember { mutableStateOf(false) }
     var selectedForDetonation: GridItem.Piece? by remember { mutableStateOf(null) }
@@ -78,10 +78,11 @@ fun GameScreen(
         val selected = selectedForDetonation ?: return
         selectedForDetonation = null
         detonateStarted = false
-        // gameUiState doesn't immediately update, so this keeps the up-to-date value
-        var currentState = gameViewModel.armPiece(selected)
 
         scope.launch {
+            // gameUiState doesn't immediately update, so this keeps the up-to-date value
+            var currentState = gameViewModel.armPiece(selected)
+
             while (currentState.stage == GameStage.DETONATION) {
                 delay(DETONATION_STEP_TIME_MS)
                 currentState = gameViewModel.runDetonationStep()
@@ -180,21 +181,21 @@ fun GameScreen(
 }
 
 
-private const val previewHeight = 835
-private const val previewWidth = 375
-//private const val previewHeight = 375
-//private const val previewWidth = 835
-
-@Preview(showBackground = false, widthDp = previewWidth, heightDp = previewHeight)
-@Composable
-fun GameScreenPreview() {
-    DevilitionTheme(darkTheme = true) {
-        Box(
-            modifier = Modifier
-                .size(height = previewHeight.dp, width = previewWidth.dp)
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-            GameScreen()
-        }
-    }
-}
+//private const val previewHeight = 835
+//private const val previewWidth = 375
+////private const val previewHeight = 375
+////private const val previewWidth = 835
+//
+//@Preview(showBackground = false, widthDp = previewWidth, heightDp = previewHeight)
+//@Composable
+//fun GameScreenPreview() {
+//    DevilitionTheme(darkTheme = true) {
+//        Box(
+//            modifier = Modifier
+//                .size(height = previewHeight.dp, width = previewWidth.dp)
+//                .background(MaterialTheme.colorScheme.background)
+//        ) {
+//            GameScreen()
+//        }
+//    }
+//}

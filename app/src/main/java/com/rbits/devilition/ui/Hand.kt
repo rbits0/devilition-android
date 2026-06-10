@@ -167,7 +167,7 @@ fun HandPreview() {
         ) {
             Hand(
                 handState = Array(3) { i -> GridItem.Piece(
-                    type = PieceType.SNAKE,
+                    pieceType = PieceType.SNAKE,
                     id = i,
                     facing = Direction.DOWN,
                     position = PiecePos.HandPos(i)

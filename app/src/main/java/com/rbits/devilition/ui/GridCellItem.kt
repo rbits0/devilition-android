@@ -94,7 +94,7 @@ fun getImageId(item: SpriteItem): Int = (
     when (item) {
 
         is GridItem.Piece -> {
-            when (item.type) {
+            when (item.pieceType) {
                 PieceType.ROCKET -> when (item.color) {
                     RocketColor.BLUE -> R.drawable.rocket
                     RocketColor.PINK -> R.drawable.rocket_alt
@@ -127,7 +127,7 @@ fun getImageId(item: SpriteItem): Int = (
         }
 
         is GridItem.Demon -> {
-            when (item.type) {
+            when (item.demonType) {
                 DemonType.MINOR -> R.drawable.demon_minor
                 DemonType.MAJOR -> if (item.health > 1) {
                     R.drawable.demon_major
@@ -144,7 +144,7 @@ fun getImageId(item: SpriteItem): Int = (
         }
 
         is GridItem.Townie -> {
-            when(item.type) {
+            when(item.townieType) {
                 TownieType.MAN_1 -> R.drawable.townie_man
                 TownieType.MAN_2 -> R.drawable.townie_man_alt
                 TownieType.WOMAN_1 -> R.drawable.townie_woman
@@ -160,7 +160,7 @@ fun getImageId(item: SpriteItem): Int = (
 @Composable
 fun GridCellItemPreview() {
     val piece = GridItem.Piece(
-        type = PieceType.SNAKE,
+        pieceType = PieceType.SNAKE,
         facing = Direction.DOWN,
         id = 0,
     )

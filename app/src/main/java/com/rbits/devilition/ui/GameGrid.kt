@@ -75,7 +75,7 @@ fun GameGridPreview() {
     val gridState = Array(GRID_HEIGHT) { Array<GridItem?>(GRID_WIDTH) {
         if (it % 2 == 0) {
             GridItem.Piece(
-                type = PieceType.SNAKE,
+                pieceType = PieceType.SNAKE,
                 facing = Direction.DOWN,
                 id = 0,
             )

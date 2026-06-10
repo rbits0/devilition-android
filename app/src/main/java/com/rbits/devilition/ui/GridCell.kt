@@ -130,7 +130,7 @@ fun GridCell(
 @Composable
 fun GridCellPreview() {
     val piece = GridItem.Piece(
-        type = PieceType.SNAKE,
+        pieceType = PieceType.SNAKE,
         facing = Direction.DOWN,
         id = 0,
     )

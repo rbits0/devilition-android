@@ -5,6 +5,7 @@ import com.rbits.devilition.TAG
 import com.rbits.devilition.data.GRID_HEIGHT
 import com.rbits.devilition.data.GRID_WIDTH
 import com.rbits.devilition.data.HAND_SIZE
+import com.rbits.devilition.data.NUM_ROUNDS
 import com.rbits.devilition.data.NUM_STARTING_TOWNIES
 import com.rbits.devilition.data.demonTypeHealth
 import com.rbits.devilition.data.demonsPerRound
@@ -205,7 +206,7 @@ data class GameUiState(
     fun roundStart() {
         round += 1
 
-        if (round < 10) {
+        if (round < NUM_ROUNDS) {
             healDemons()
 
             placeRandomHoles(count = 1)
@@ -463,6 +464,11 @@ data class GameUiState(
 
         if (numDemons > numTownies) {
             stage = GameStage.LOSE
+            return
+        }
+
+        if (round == NUM_ROUNDS) {
+            stage = GameStage.WIN
             return
         }
 

@@ -41,7 +41,7 @@ fun GameScreen(
     gameViewModel: GameViewModel,
 ) {
     val scope = rememberCoroutineScope()
-    val gameUiState by gameViewModel.gameUiState.collectAsStateWithLifecycle()
+    val gameUiState by gameViewModel.uiState.collectAsStateWithLifecycle()
     val dragAndDropState = rememberDragAndDropState<GridItem.Piece>()
     var detonateStarted by remember { mutableStateOf(false) }
     var selectedForDetonation: GridItem.Piece? by remember { mutableStateOf(null) }

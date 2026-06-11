@@ -15,6 +15,7 @@ import com.rbits.devilition.data.piecesPerRound
 import com.rbits.devilition.data.tierPieces
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.Required
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
@@ -114,6 +115,7 @@ sealed class GridItem {
         val id: Int,
         val placementConfirmed: Boolean = true,
         val position: PiecePos? = null,
+        @Required
         val color: RocketColor = RocketColor.entries.random(),
         var rocketTargetId: Int? = null,
     ) : GridItem(), SpriteItem

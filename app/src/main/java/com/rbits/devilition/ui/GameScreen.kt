@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mohamedrejeb.compose.dnd.DragAndDropContainer
 import com.mohamedrejeb.compose.dnd.rememberDragAndDropState
@@ -41,7 +41,7 @@ fun GameScreen(
     gameViewModel: GameViewModel,
 ) {
     val scope = rememberCoroutineScope()
-    val gameUiState by gameViewModel.gameUiState.collectAsState()
+    val gameUiState by gameViewModel.gameUiState.collectAsStateWithLifecycle()
     val dragAndDropState = rememberDragAndDropState<GridItem.Piece>()
     var detonateStarted by remember { mutableStateOf(false) }
     var selectedForDetonation: GridItem.Piece? by remember { mutableStateOf(null) }

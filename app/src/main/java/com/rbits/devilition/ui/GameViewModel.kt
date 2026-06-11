@@ -20,7 +20,7 @@ class GameViewModel(
     val gameUiState = repository.gameFlow.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = GameUiState(),
+        initialValue = GameUiState.new(),
     )
 
     fun roundStart() {

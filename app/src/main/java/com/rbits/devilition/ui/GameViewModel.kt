@@ -34,116 +34,56 @@ class GameViewModel(
 
 
     fun roundStart() {
-        val newValue = _uiState.updateAndGet {
-            val newValue = it.clone()
-            newValue.roundStart()
-            newValue
-        }
-
-        viewModelScope.launch {
-            repository.updateState(newValue)
+        modifyUiState {
+            it.roundStart()
         }
     }
 
     fun movePiece(item: GridItem.Piece, to: PiecePos.GridPos) {
-        val newValue = _uiState.updateAndGet {
-            val newValue = it.clone()
-            newValue.movePiece(item, to)
-            newValue
-        }
-
-        viewModelScope.launch {
-            repository.updateState(newValue)
+        modifyUiState {
+            it.movePiece(item, to)
         }
     }
 
     fun rotatePiece(item: GridItem.Piece) {
-        val newValue = _uiState.updateAndGet {
-            val newValue = it.clone()
-            newValue.rotatePiece(item)
-            newValue
-        }
-
-        viewModelScope.launch {
-            repository.updateState(newValue)
+        modifyUiState {
+            it.rotatePiece(item)
         }
     }
 
     fun confirmPlacement() {
-        val newValue = _uiState.updateAndGet {
-            val newValue = it.clone()
-            newValue.confirmPlacement()
-            newValue
-        }
-
-        viewModelScope.launch {
-            repository.updateState(newValue)
+        modifyUiState {
+            it.confirmPlacement()
         }
     }
 
     fun cancelPlacement() {
-        val newValue = _uiState.updateAndGet {
-            val newValue = it.clone()
-            newValue.cancelPlacement()
-            newValue
-        }
-
-        viewModelScope.launch {
-            repository.updateState(newValue)
+        modifyUiState {
+            it.cancelPlacement()
         }
     }
 
     fun armPiece(item: GridItem.Piece): GameUiState {
-        val newValue = _uiState.updateAndGet {
-            val newValue = it.clone()
-            newValue.armPiece(item)
-            newValue
+        return modifyUiState {
+            it.armPiece(item)
         }
-
-        viewModelScope.launch {
-            repository.updateState(newValue)
-        }
-
-        return newValue
     }
 
     fun runDetonationStep(): GameUiState {
-        val newValue = _uiState.updateAndGet {
-            val newValue = it.clone()
-            newValue.runDetonationStep()
-            newValue
+        return modifyUiState {
+            it.runDetonationStep()
         }
-
-        viewModelScope.launch {
-            repository.updateState(newValue)
-        }
-
-        return newValue
     }
 
     fun roundEnd(): GameUiState {
-        val newValue = _uiState.updateAndGet {
-            val newValue = it.clone()
-            newValue.roundEnd()
-            newValue
+        return modifyUiState {
+            it.roundEnd()
         }
-
-        viewModelScope.launch {
-            repository.updateState(newValue)
-        }
-
-        return newValue
     }
 
     fun calculateScore() {
-        val newValue = _uiState.updateAndGet {
-            val newValue = it.clone()
-            newValue.calculateScore()
-            newValue
-        }
-
-        viewModelScope.launch {
-            repository.updateState(newValue)
+        modifyUiState {
+            it.calculateScore()
         }
     }
 
@@ -155,6 +95,20 @@ class GameViewModel(
         viewModelScope.launch {
             repository.updateState(newValue)
         }
+    }
+
+    private fun modifyUiState(action: (GameUiState) -> Unit): GameUiState {
+        val newValue = _uiState.updateAndGet {
+            val newValue = it.clone()
+            action(newValue)
+            newValue
+        }
+
+        viewModelScope.launch {
+            repository.updateState(newValue)
+        }
+
+        return newValue
     }
 }
 

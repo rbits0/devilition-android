@@ -17,8 +17,8 @@ import androidx.datastore.dataStore
 import androidx.lifecycle.ViewModelProvider
 import com.rbits.devilition.data.GameRepository
 import com.rbits.devilition.ui.GameScreen
-import com.rbits.devilition.ui.GameUiState
-import com.rbits.devilition.ui.GameUiStateSerializer
+import com.rbits.devilition.ui.GameState
+import com.rbits.devilition.ui.GameStateSerializer
 import com.rbits.devilition.ui.GameViewModel
 import com.rbits.devilition.ui.GameViewModelFactory
 import com.rbits.devilition.ui.theme.DevilitionTheme
@@ -26,9 +26,9 @@ import com.rbits.devilition.ui.theme.DevilitionTheme
 const val TAG = "devilition"
 const val DATA_STORE_FILE_NAME = "game_state.json"
 
-private val Context.gameStore: DataStore<GameUiState> by dataStore(
+private val Context.gameStore: DataStore<GameState> by dataStore(
     fileName = DATA_STORE_FILE_NAME,
-    serializer = GameUiStateSerializer,
+    serializer = GameStateSerializer,
 )
 
 class MainActivity : ComponentActivity() {

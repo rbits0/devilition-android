@@ -133,7 +133,7 @@ sealed class GridItem {
 
 
 @Serializable
-data class GameUiState(
+data class GameState(
     var grid: Array<Array<GridItem?>> = Array(GRID_HEIGHT) { Array(GRID_WIDTH) { null } },
     var hand: Array<GridItem.Piece?> = Array(HAND_SIZE) { null },
     var bag: List<PieceType> = listOf(),
@@ -150,7 +150,7 @@ data class GameUiState(
 ) {
 
     companion object {
-        fun new(): GameUiState {
+        fun new(): GameState {
             val bag: MutableList<PieceType> = mutableListOf()
             var idCounter = 0
             val hand: MutableList<GridItem.Piece> = mutableListOf()
@@ -170,7 +170,7 @@ data class GameUiState(
                 )
             }
 
-            val state = GameUiState(
+            val state = GameState(
                 hand = hand.toTypedArray(),
                 bag = bag,
                 idCounter = idCounter,
@@ -191,7 +191,7 @@ data class GameUiState(
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as GameUiState
+        other as GameState
 
         if (numAvailablePieces != other.numAvailablePieces) return false
         if (round != other.round) return false
@@ -222,7 +222,7 @@ data class GameUiState(
     }
 
 
-    fun clone(): GameUiState = this.copy(
+    fun clone(): GameState = this.copy(
         grid = grid.map{ it.clone() }.toTypedArray(),
         hand = hand.clone(),
     )
@@ -695,19 +695,19 @@ data class GameUiState(
     )
 }
 
-object GameUiStateSerializer : Serializer<GameUiState> {
-    override val defaultValue = GameUiState.new()
+object GameStateSerializer : Serializer<GameState> {
+    override val defaultValue = GameState.new()
 
     override suspend fun readFrom(input: InputStream) =
         try {
-            Json.decodeFromString<GameUiState>(
+            Json.decodeFromString<GameState>(
                 input.readBytes().decodeToString()
             )
         } catch (serialization: SerializationException) {
-            throw CorruptionException("Unable to read GameUiState", serialization)
+            throw CorruptionException("Unable to read GameState", serialization)
         }
 
-    override suspend fun writeTo(t: GameUiState, output: OutputStream) {
+    override suspend fun writeTo(t: GameState, output: OutputStream) {
         withContext(Dispatchers.IO) {
             output.write(
                 Json.encodeToString(t)

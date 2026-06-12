@@ -19,77 +19,77 @@ class GameViewModel(
     // We do this because repository is too slow to update the values, which means the UI doesn't
     // update fast enough when it uses repository.gameFlow
 
-    private val _uiState = MutableStateFlow(GameUiState())
-    val uiState = _uiState.asStateFlow()
+    private val _gameState = MutableStateFlow(GameState())
+    val gameState = _gameState.asStateFlow()
 
     // Initialise the state from the repository
     // The repository should stay up to date while the application is running, so we only need to
     // get the initial value
     init {
         viewModelScope.launch {
-            val gameUiState = repository.gameFlow.first()
-            _uiState.update { gameUiState }
+            val gameState = repository.gameFlow.first()
+            _gameState.update { gameState }
         }
     }
 
 
     fun roundStart() {
-        modifyUiState {
+        modifyGameState {
             it.roundStart()
         }
     }
 
     fun movePiece(item: GridItem.Piece, to: PiecePos.GridPos) {
-        modifyUiState {
+        modifyGameState {
             it.movePiece(item, to)
         }
     }
 
     fun rotatePiece(item: GridItem.Piece) {
-        modifyUiState {
+        modifyGameState {
             it.rotatePiece(item)
         }
     }
 
     fun confirmPlacement() {
-        modifyUiState {
+        modifyGameState {
             it.confirmPlacement()
         }
     }
 
     fun cancelPlacement() {
-        modifyUiState {
+        modifyGameState {
             it.cancelPlacement()
         }
     }
 
-    fun armPiece(item: GridItem.Piece): GameUiState {
-        return modifyUiState {
+    fun armPiece(item: GridItem.Piece): GameState {
+        return modifyGameState {
             it.armPiece(item)
         }
     }
 
-    fun runDetonationStep(): GameUiState {
-        return modifyUiState {
+    fun runDetonationStep(): GameState {
+        return modifyGameState {
             it.runDetonationStep()
         }
     }
 
-    fun roundEnd(): GameUiState {
-        return modifyUiState {
+    fun roundEnd(): GameState {
+        return modifyGameState {
             it.roundEnd()
         }
     }
 
     fun calculateScore() {
-        modifyUiState {
+        modifyGameState {
             it.calculateScore()
         }
     }
 
     fun reset() {
-        val newValue = _uiState.updateAndGet {
-            GameUiState.new()
+        val newValue = _gameState.updateAndGet {
+            GameState.new()
         }
 
         viewModelScope.launch {
@@ -97,8 +97,8 @@ class GameViewModel(
         }
     }
 
-    private fun modifyUiState(action: (GameUiState) -> Unit): GameUiState {
-        val newValue = _uiState.updateAndGet {
+    private fun modifyGameState(action: (GameState) -> Unit): GameState {
+        val newValue = _gameState.updateAndGet {
             val newValue = it.clone()
             action(newValue)
             newValue

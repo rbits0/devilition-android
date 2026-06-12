@@ -1,15 +1,11 @@
 package com.rbits.devilition.ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -19,16 +15,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mohamedrejeb.compose.dnd.DragAndDropContainer
 import com.mohamedrejeb.compose.dnd.rememberDragAndDropState
 import com.rbits.devilition.R
 import com.rbits.devilition.data.GRID_HEIGHT
 import com.rbits.devilition.data.GRID_WIDTH
-import com.rbits.devilition.ui.theme.DevilitionTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -41,7 +34,7 @@ fun GameScreen(
     gameViewModel: GameViewModel,
 ) {
     val scope = rememberCoroutineScope()
-    val gameUiState by gameViewModel.uiState.collectAsStateWithLifecycle()
+    val gameState by gameViewModel.gameState.collectAsStateWithLifecycle()
     val dragAndDropState = rememberDragAndDropState<GridItem.Piece>()
     var detonateStarted by remember { mutableStateOf(false) }
     var selectedForDetonation: GridItem.Piece? by remember { mutableStateOf(null) }
@@ -49,18 +42,18 @@ fun GameScreen(
     val targetedCells by remember(
         dragAndDropState.draggedItem?.data,
         dragAndDropState.hoveredDropTargetKey,
-        gameUiState.unconfirmedPiece,
+        gameState.unconfirmedPiece,
     ) { derivedStateOf {
         val draggedItem = dragAndDropState.draggedItem?.data
         val position = dragAndDropState.hoveredDropTargetKey
-        val unconfirmedPiece= gameUiState.unconfirmedPiece
+        val unconfirmedPiece= gameState.unconfirmedPiece
 
         if (draggedItem != null && position is PiecePos.GridPos) {
-            gameUiState.getPieceTargetCells(
+            gameState.getPieceTargetCells(
                 draggedItem.copy(position = (position))
             )
         } else if (unconfirmedPiece != null) {
-            gameUiState.getPieceTargetCells(unconfirmedPiece)
+            gameState.getPieceTargetCells(unconfirmedPiece)
         } else {
             null
         }
@@ -80,7 +73,7 @@ fun GameScreen(
         detonateStarted = false
 
         scope.launch {
-            // gameUiState doesn't immediately update, so this keeps the up-to-date value
+            // gameState doesn't immediately update, so this keeps the up-to-date value
             var currentState = gameViewModel.armPiece(selected)
 
             while (currentState.stage == GameStage.DETONATION) {
@@ -88,7 +81,6 @@ fun GameScreen(
                 currentState = gameViewModel.runDetonationStep()
             }
 
-            // gameUiState doesn't update immediately
             currentState = gameViewModel.roundEnd()
             if (currentState.stage == GameStage.ROUND_START) {
                 delay(DETONATION_STEP_TIME_MS)
@@ -123,7 +115,7 @@ fun GameScreen(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 GameGrid(
-                    gameUiState.grid,
+                    gameState.grid,
                     dragAndDropState,
                     onItemDropped = { item, position ->
                         gameViewModel.movePiece(item, position)
@@ -135,16 +127,16 @@ fun GameScreen(
                 )
 
                 Hand(
-                    handState = gameUiState.hand,
-                    numAvailablePieces = gameUiState.numAvailablePieces,
+                    handState = gameState.hand,
+                    numAvailablePieces = gameState.numAvailablePieces,
                     dragAndDropState = dragAndDropState,
                     cellSize = cellSize,
                     dragEnabled = (
-                        gameUiState.canPlacePieceFromHand()
+                        gameState.canPlacePieceFromHand()
                             && (!detonateStarted)
                     ),
-                    confirmEnabled = gameUiState.unconfirmedPiece!= null,
-                    startDetonateEnabled = gameUiState.unconfirmedPiece== null,
+                    confirmEnabled = gameState.unconfirmedPiece!= null,
+                    startDetonateEnabled = gameState.unconfirmedPiece== null,
                     detonateStarted = detonateStarted,
                     confirmDetonateEnabled = selectedForDetonation != null,
                     onItemRotated = { item ->
@@ -164,15 +156,15 @@ fun GameScreen(
                         .fillMaxWidth()
                 )
 
-                if (gameUiState.stage == GameStage.LOSE) {
+                if (gameState.stage == GameStage.LOSE) {
                     WinLoseDialog(
                         onDismiss = { gameViewModel.reset() },
-                        text = stringResource(R.string.lose, gameUiState.score),
+                        text = stringResource(R.string.lose, gameState.score),
                     )
-                } else if (gameUiState.stage == GameStage.WIN) {
+                } else if (gameState.stage == GameStage.WIN) {
                     WinLoseDialog(
                         onDismiss = { gameViewModel.reset() },
-                        text = stringResource(R.string.win, gameUiState.score),
+                        text = stringResource(R.string.win, gameState.score),
                     )
                 }
             }

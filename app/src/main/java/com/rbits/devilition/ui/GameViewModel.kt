@@ -81,12 +81,6 @@ class GameViewModel(
         }
     }
 
-    fun calculateScore() {
-        modifyGameState {
-            it.calculateScore()
-        }
-    }
-
     fun reset() {
         val newValue = _gameState.updateAndGet {
             GameState.new()

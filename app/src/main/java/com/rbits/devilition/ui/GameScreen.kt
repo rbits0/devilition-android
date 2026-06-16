@@ -86,7 +86,6 @@ fun GameScreen(
                 delay(DETONATION_STEP_TIME_MS)
                 gameViewModel.roundStart()
             } else {
-                gameViewModel.calculateScore()
             }
         }
     }
@@ -159,12 +158,12 @@ fun GameScreen(
                 if (gameState.stage == GameStage.LOSE) {
                     WinLoseDialog(
                         onDismiss = { gameViewModel.reset() },
-                        text = stringResource(R.string.lose, gameState.score),
+                        text = stringResource(R.string.lose, gameState.score()),
                     )
                 } else if (gameState.stage == GameStage.WIN) {
                     WinLoseDialog(
                         onDismiss = { gameViewModel.reset() },
-                        text = stringResource(R.string.win, gameState.score),
+                        text = stringResource(R.string.win, gameState.score()),
                     )
                 }
             }

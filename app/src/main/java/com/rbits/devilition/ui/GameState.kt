@@ -138,7 +138,6 @@ data class GameState(
     var bag: List<PieceType> = listOf(),
     var numAvailablePieces: Int = 0,
     var round: Int = 0,
-    var score: Int = 0,
     var idCounter: Int = 0,
     var rocketColor: RocketColor = RocketColor.PINK,
     // Position of the piece that has been dragged onto the board,
@@ -182,7 +181,6 @@ data class GameState(
 
         if (numAvailablePieces != other.numAvailablePieces) return false
         if (round != other.round) return false
-        if (score != other.score) return false
         if (idCounter != other.idCounter) return false
         if (!grid.contentDeepEquals(other.grid)) return false
         if (!hand.contentEquals(other.hand)) return false
@@ -198,7 +196,6 @@ data class GameState(
     override fun hashCode(): Int {
         var result = numAvailablePieces
         result = 31 * result + round
-        result = 31 * result + score
         result = 31 * result + idCounter
         result = 31 * result + grid.contentDeepHashCode()
         result = 31 * result + hand.contentHashCode()
@@ -486,14 +483,14 @@ data class GameState(
         stage = GameStage.ROUND_START
     }
 
-    fun calculateScore() {
-        score = 10_000
+    fun score(): Int {
         val numPiecesAndTownies = grid.flatten().count {
             it is GridItem.Piece || it is GridItem.Townie
         }
-        score += (numPiecesAndTownies + numAvailablePieces) * 1_000
+        val score = 10_000 + (numPiecesAndTownies + numAvailablePieces) * 1_000
 
         // TODO: Time bonus
+        return score
     }
 
     private fun detonatePiece(item: GridItem.Piece) {

@@ -91,68 +91,68 @@ fun GridCellItem(
 
 @DrawableRes
 fun getImageId(item: SpriteItem): Int = (
-    when (item) {
+        when (item) {
 
-        is GridItem.Piece -> {
-            when (item.pieceType) {
-                PieceType.ROCKET -> when (item.color) {
-                    RocketColor.BLUE -> R.drawable.rocket
-                    RocketColor.PINK -> R.drawable.rocket_alt
+            is GridItem.Piece -> {
+                when (item.pieceType) {
+                    PieceType.ROCKET -> when (item.color) {
+                        RocketColor.BLUE -> R.drawable.rocket
+                        else -> R.drawable.rocket_alt
+                    }
+                    PieceType.ROCKET_PAD -> when (item.color) {
+                        RocketColor.BLUE -> R.drawable.rocket_pad
+                        else -> R.drawable.rocket_pad_alt
+                    }
+                    PieceType.SNAKE -> when (item.facing) {
+                        Direction.UP, Direction.DOWN -> R.drawable.snake_vert
+                        Direction.LEFT, Direction.RIGHT -> R.drawable.snake_horz
+                    }
+                    PieceType.STRAWMAN -> when (item.facing) {
+                        Direction.UP -> R.drawable.straw_man_u
+                        Direction.DOWN -> R.drawable.straw_man_d
+                        Direction.LEFT -> R.drawable.straw_man_l
+                        Direction.RIGHT -> R.drawable.straw_man_r
+                    }
+                    PieceType.CANNON -> when (item.facing) {
+                        Direction.UP -> R.drawable.cannon_u
+                        Direction.DOWN -> R.drawable.cannon_d
+                        Direction.LEFT -> R.drawable.cannon_l
+                        Direction.RIGHT -> R.drawable.cannon_r
+                    }
+                    PieceType.TOAD -> R.drawable.toad
+                    PieceType.CROSS -> R.drawable.cross
+                    PieceType.PLUS -> R.drawable.plus
+                    PieceType.BOMB -> R.drawable.bomb
                 }
-                PieceType.ROCKET_PAD -> when (item.color) {
-                    RocketColor.BLUE -> R.drawable.rocket_pad
-                    RocketColor.PINK -> R.drawable.rocket_pad_alt
-                }
-                PieceType.SNAKE -> when (item.facing) {
-                    Direction.UP, Direction.DOWN -> R.drawable.snake_vert
-                    Direction.LEFT, Direction.RIGHT -> R.drawable.snake_horz
-                }
-                PieceType.STRAWMAN -> when (item.facing) {
-                    Direction.UP -> R.drawable.straw_man_u
-                    Direction.DOWN -> R.drawable.straw_man_d
-                    Direction.LEFT -> R.drawable.straw_man_l
-                    Direction.RIGHT -> R.drawable.straw_man_r
-                }
-                PieceType.CANNON -> when (item.facing) {
-                    Direction.UP -> R.drawable.cannon_u
-                    Direction.DOWN -> R.drawable.cannon_d
-                    Direction.LEFT -> R.drawable.cannon_l
-                    Direction.RIGHT -> R.drawable.cannon_r
-                }
-                PieceType.TOAD -> R.drawable.toad
-                PieceType.CROSS -> R.drawable.cross
-                PieceType.PLUS -> R.drawable.plus
-                PieceType.BOMB -> R.drawable.bomb
             }
-        }
 
-        is GridItem.Demon -> {
-            when (item.demonType) {
-                DemonType.MINOR -> R.drawable.demon_minor
-                DemonType.MAJOR -> if (item.health > 1) {
-                    R.drawable.demon_major
-                } else {
-                    R.drawable.demon_major_hurt
+            is GridItem.Demon -> {
+                when (item.demonType) {
+                    DemonType.MINOR -> R.drawable.demon_minor
+                    DemonType.MAJOR -> if (item.health > 1) {
+                        R.drawable.demon_major
+                    } else {
+                        R.drawable.demon_major_hurt
+                    }
+                    DemonType.ELDER -> if (item.health > 1) {
+                        R.drawable.demon_elder
+                    } else {
+                        R.drawable.demon_elder_hurt
+                    }
+                    DemonType.BOSS -> R.drawable.demon_boss
                 }
-                DemonType.ELDER -> if (item.health > 1) {
-                    R.drawable.demon_elder
-                } else {
-                    R.drawable.demon_elder_hurt
+            }
+
+            is GridItem.Townie -> {
+                when(item.townieType) {
+                    TownieType.MAN_1 -> R.drawable.townie_man
+                    TownieType.MAN_2 -> R.drawable.townie_man_alt
+                    TownieType.WOMAN_1 -> R.drawable.townie_woman
+                    TownieType.WOMAN_2 -> R.drawable.townie_woman_alt
                 }
-                DemonType.BOSS -> R.drawable.demon_boss
             }
-        }
 
-        is GridItem.Townie -> {
-            when(item.townieType) {
-                TownieType.MAN_1 -> R.drawable.townie_man
-                TownieType.MAN_2 -> R.drawable.townie_man_alt
-                TownieType.WOMAN_1 -> R.drawable.townie_woman
-                TownieType.WOMAN_2 -> R.drawable.townie_woman_alt
-            }
         }
-
-    }
 )
 
 

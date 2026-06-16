@@ -115,8 +115,7 @@ sealed class GridItem {
         val id: Int,
         val placementConfirmed: Boolean = true,
         val position: PiecePos? = null,
-        @Required
-        val color: RocketColor = RocketColor.entries.random(),
+        val color: RocketColor? = null,
         var rocketTargetId: Int? = null,
     ) : GridItem(), SpriteItem
 
@@ -141,6 +140,7 @@ data class GameState(
     var round: Int = 0,
     var score: Int = 0,
     var idCounter: Int = 0,
+    var rocketColor: RocketColor = RocketColor.PINK,
     // Position of the piece that has been dragged onto the board,
     // but hasn't had placement confirmed
     var unconfirmedPiece: GridItem.Piece? = null,
@@ -151,30 +151,17 @@ data class GameState(
 
     companion object {
         fun new(): GameState {
-            val bag: MutableList<PieceType> = mutableListOf()
-            var idCounter = 0
-            val hand: MutableList<GridItem.Piece> = mutableListOf()
+            val state = GameState()
 
             // Start with `HAND_SIZE` pieces in hand
+            val bag: MutableList<PieceType> = mutableListOf()
             for (i in 0..<HAND_SIZE) {
-                val id = idCounter
                 val type = drawNewPiece(bag)
-                idCounter++
-                hand.add(
-                    GridItem.Piece(
-                        pieceType = type,
-                        facing = Direction.DOWN,
-                        id = id,
-                        position = PiecePos.HandPos(i),
-                    )
-                )
+                val piece = state.createPieceOfType(type, PiecePos.HandPos(i))
+                state.hand[i] = piece
             }
+            state.bag = bag
 
-            val state = GameState(
-                hand = hand.toTypedArray(),
-                bag = bag,
-                idCounter = idCounter,
-            )
 
             for (_i in 0..<NUM_STARTING_TOWNIES) {
                 state.placeRandomTownie()
@@ -200,6 +187,7 @@ data class GameState(
         if (!grid.contentDeepEquals(other.grid)) return false
         if (!hand.contentEquals(other.hand)) return false
         if (bag != other.bag) return false
+        if (rocketColor != other.rocketColor) return false
         if (unconfirmedPiece != other.unconfirmedPiece) return false
         if (armedPieces != other.armedPieces) return false
         if (stage != other.stage) return false
@@ -215,6 +203,7 @@ data class GameState(
         result = 31 * result + grid.contentDeepHashCode()
         result = 31 * result + hand.contentHashCode()
         result = 31 * result + bag.hashCode()
+        result = 31 * result + rocketColor.hashCode()
         result = 31 * result + (unconfirmedPiece?.hashCode() ?: 0)
         result = 31 * result + armedPieces.hashCode()
         result = 31 * result + stage.hashCode()
@@ -396,14 +385,12 @@ data class GameState(
         }
 
         val newPiecePos = PiecePos.HandPos(hand.indexOf(null))
-        val id = idCounter
-        idCounter += 1
         numAvailablePieces -= 1
 
         if (unconfirmedPiece.pieceType == PieceType.ROCKET) {
             // Mark piece as confirmed
             grid[position.x][position.y] = unconfirmedPiece.copy(
-                rocketTargetId = id,
+                rocketTargetId = idCounter,
                 placementConfirmed = true,
             )
 
@@ -412,10 +399,11 @@ data class GameState(
                 pieceType = PieceType.ROCKET_PAD,
                 facing = Direction.DOWN,
                 position = newPiecePos,
-                id = id,
+                id = idCounter,
                 color = unconfirmedPiece.color,
             )
 
+            idCounter += 1
         } else {
             // Mark piece as confirmed
             grid[position.x][position.y] = unconfirmedPiece.copy(
@@ -425,12 +413,7 @@ data class GameState(
             // Draw piece from bag to replace moved piece
             val newBag = bag.toMutableList()
             val type = drawNewPiece(newBag)
-            hand[newPiecePos.pos] = GridItem.Piece(
-                pieceType = type,
-                facing = Direction.DOWN,
-                id = id,
-                position = newPiecePos,
-            )
+            hand[newPiecePos.pos] = createPieceOfType(type, newPiecePos)
             bag = newBag
         }
 
@@ -686,6 +669,35 @@ data class GameState(
         val pos = emptySpaces.random()
         val townieType = TownieType.entries.random()
         grid[pos.x][pos.y] = GridItem.Townie(townieType = townieType)
+    }
+
+    fun createPieceOfType(type: PieceType, position: PiecePos): GridItem.Piece {
+        var piece: GridItem.Piece
+
+        if (type == PieceType.ROCKET) {
+            piece = GridItem.Piece(
+                pieceType = type,
+                facing = Direction.DOWN,
+                id = idCounter,
+                position = position,
+                color = rocketColor,
+            )
+
+            rocketColor = when (rocketColor) {
+                RocketColor.PINK -> RocketColor.BLUE
+                RocketColor.BLUE -> RocketColor.PINK
+            }
+        } else {
+            piece = GridItem.Piece(
+                pieceType = type,
+                facing = Direction.DOWN,
+                id = idCounter,
+                position = position,
+            )
+        }
+
+        idCounter += 1
+        return piece
     }
 
     fun canPlacePieceFromHand(): Boolean = (

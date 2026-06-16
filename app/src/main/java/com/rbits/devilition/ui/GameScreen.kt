@@ -82,10 +82,15 @@ fun GameScreen(
             }
 
             currentState = gameViewModel.roundEnd()
-            if (currentState.stage == GameStage.ROUND_START) {
-                delay(DETONATION_STEP_TIME_MS)
-                gameViewModel.roundStart()
-            } else {
+            when (currentState.stage) {
+                GameStage.ROUND_START -> {
+                    delay(DETONATION_STEP_TIME_MS)
+                    gameViewModel.roundStart()
+                }
+                GameStage.WIN, GameStage.LOSE -> {
+                    gameViewModel.addToPastGames()
+                }
+                else -> {}
             }
         }
     }

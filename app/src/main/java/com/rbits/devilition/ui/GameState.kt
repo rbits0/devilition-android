@@ -1,8 +1,6 @@
 package com.rbits.devilition.ui
 
 import android.util.Log
-import androidx.datastore.core.CorruptionException
-import androidx.datastore.core.Serializer
 import com.rbits.devilition.TAG
 import com.rbits.devilition.data.GRID_HEIGHT
 import com.rbits.devilition.data.GRID_WIDTH
@@ -13,14 +11,7 @@ import com.rbits.devilition.data.demonTypeHealth
 import com.rbits.devilition.data.demonsPerRound
 import com.rbits.devilition.data.piecesPerRound
 import com.rbits.devilition.data.tierPieces
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import kotlinx.serialization.Required
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerializationException
-import kotlinx.serialization.json.Json
-import java.io.InputStream
-import java.io.OutputStream
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.math.max
@@ -704,27 +695,6 @@ data class GameState(
     )
 }
 
-object GameStateSerializer : Serializer<GameState> {
-    override val defaultValue = GameState.new()
-
-    override suspend fun readFrom(input: InputStream) =
-        try {
-            Json.decodeFromString<GameState>(
-                input.readBytes().decodeToString()
-            )
-        } catch (serialization: SerializationException) {
-            throw CorruptionException("Unable to read GameState", serialization)
-        }
-
-    override suspend fun writeTo(t: GameState, output: OutputStream) {
-        withContext(Dispatchers.IO) {
-            output.write(
-                Json.encodeToString(t)
-                    .encodeToByteArray()
-            )
-        }
-    }
-}
 
 fun getEmptySpaces(grid: Array<Array<GridItem?>>): List<PiecePos.GridPos> {
     return grid.flatMapIndexed { rowIndex, row ->

@@ -16,19 +16,26 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.dataStore
 import androidx.lifecycle.ViewModelProvider
 import com.rbits.devilition.data.GameRepository
+import com.rbits.devilition.data.GameStateSerializer
+import com.rbits.devilition.data.PastGamesSerializer
 import com.rbits.devilition.ui.GameScreen
 import com.rbits.devilition.ui.GameState
-import com.rbits.devilition.ui.GameStateSerializer
 import com.rbits.devilition.ui.GameViewModel
 import com.rbits.devilition.ui.GameViewModelFactory
 import com.rbits.devilition.ui.theme.DevilitionTheme
 
 const val TAG = "devilition"
-const val DATA_STORE_FILE_NAME = "game_state.json"
+const val GAME_STORE_FILE_NAME = "game_state.json"
+const val PAST_GAMES_STORE_FILE_NAME = "past_games.json"
 
 private val Context.gameStore: DataStore<GameState> by dataStore(
-    fileName = DATA_STORE_FILE_NAME,
+    fileName = GAME_STORE_FILE_NAME,
     serializer = GameStateSerializer,
+)
+
+private val Context.pastGamesStore: DataStore<List<GameState>> by dataStore(
+    fileName = PAST_GAMES_STORE_FILE_NAME,
+    serializer = PastGamesSerializer,
 )
 
 class MainActivity : ComponentActivity() {
@@ -40,7 +47,7 @@ class MainActivity : ComponentActivity() {
 
         gameViewModel = ViewModelProvider(
             this,
-            GameViewModelFactory(GameRepository(gameStore))
+            GameViewModelFactory(GameRepository(gameStore, pastGamesStore))
         )[GameViewModel::class]
 
         setContent {

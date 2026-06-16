@@ -91,6 +91,12 @@ class GameViewModel(
         }
     }
 
+    fun addToPastGames() {
+        viewModelScope.launch {
+            repository.addPastGame(gameState.value)
+        }
+    }
+
     private fun modifyGameState(action: (GameState) -> Unit): GameState {
         val newValue = _gameState.updateAndGet {
             val newValue = it.clone()

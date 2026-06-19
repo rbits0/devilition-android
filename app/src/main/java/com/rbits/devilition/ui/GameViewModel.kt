@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.rbits.devilition.data.GameRepository
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
@@ -12,6 +14,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
 
+/** How often the seconds should be saved to GameRepository */
+const val SECONDS_UPDATE_THRESHOLD = 10
+
+
+// Should theoretically be safe to update from multiple threads
 class GameViewModel(
     private val repository: GameRepository,
 ) : ViewModel() {
@@ -21,6 +28,7 @@ class GameViewModel(
 
     private val _gameState = MutableStateFlow(GameState())
     val gameState = _gameState.asStateFlow()
+    private var timerJob: Job? = null
 
     // Initialise the state from the repository
     // The repository should stay up to date while the application is running, so we only need to
@@ -96,6 +104,36 @@ class GameViewModel(
             repository.addPastGame(gameState.value)
         }
     }
+
+    fun startTimer() {
+        timerJob = viewModelScope.launch {
+            while (true) {
+                delay(1000L)
+
+                viewModelScope.launch {
+                    val newValue = _gameState.updateAndGet {
+                        val newValue = it.clone()
+                        newValue.seconds += 1
+                        newValue
+                    }
+
+                    if (newValue.seconds % SECONDS_UPDATE_THRESHOLD == 0) {
+                        repository.updateState(newValue)
+                    }
+                }
+            }
+        }
+    }
+
+    fun stopTimer() {
+        timerJob?.cancel()
+        timerJob = null
+
+        viewModelScope.launch {
+            repository.updateState(gameState.value)
+        }
+    }
+
 
     private fun modifyGameState(action: (GameState) -> Unit): GameState {
         val newValue = _gameState.updateAndGet {

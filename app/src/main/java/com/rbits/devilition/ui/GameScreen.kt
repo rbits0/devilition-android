@@ -16,6 +16,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mohamedrejeb.compose.dnd.DragAndDropContainer
 import com.mohamedrejeb.compose.dnd.rememberDragAndDropState
@@ -58,6 +60,14 @@ fun GameScreen(
             null
         }
     } }
+
+    LifecycleEventEffect(Lifecycle.Event.ON_START) {
+        gameViewModel.startTimer()
+    }
+
+    LifecycleEventEffect(Lifecycle.Event.ON_STOP) {
+        gameViewModel.stopTimer()
+    }
 
     fun onItemClicked(item: GridItem.Piece) {
         if (detonateStarted) {

@@ -137,6 +137,7 @@ data class GameState(
     var armedPieces: MutableSet<GridItem.Piece> = mutableSetOf(),
     // stage refers to what actions are about to happen or are happening.
     var stage: GameStage = GameStage.ROUND_START,
+    var seconds: Int = 0
 ) {
 
     companion object {
@@ -180,6 +181,7 @@ data class GameState(
         if (unconfirmedPiece != other.unconfirmedPiece) return false
         if (armedPieces != other.armedPieces) return false
         if (stage != other.stage) return false
+        if (seconds != other.seconds) return false
 
         return true
     }
@@ -195,6 +197,7 @@ data class GameState(
         result = 31 * result + (unconfirmedPiece?.hashCode() ?: 0)
         result = 31 * result + armedPieces.hashCode()
         result = 31 * result + stage.hashCode()
+        result = 31 * result + seconds
         return result
     }
 

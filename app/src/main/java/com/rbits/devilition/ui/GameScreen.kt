@@ -1,11 +1,15 @@
 package com.rbits.devilition.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -15,15 +19,19 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mohamedrejeb.compose.dnd.DragAndDropContainer
 import com.mohamedrejeb.compose.dnd.rememberDragAndDropState
 import com.rbits.devilition.R
 import com.rbits.devilition.data.GRID_HEIGHT
 import com.rbits.devilition.data.GRID_WIDTH
+import com.rbits.devilition.data.MockGameRepository
+import com.rbits.devilition.ui.theme.DevilitionTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -32,8 +40,8 @@ const val DETONATION_STEP_TIME_MS = 1000L
 
 @Composable
 fun GameScreen(
-    modifier: Modifier = Modifier,
     gameViewModel: GameViewModel,
+    modifier: Modifier = Modifier,
 ) {
     val scope = rememberCoroutineScope()
     val gameState by gameViewModel.gameState.collectAsStateWithLifecycle()
@@ -187,21 +195,25 @@ fun GameScreen(
 }
 
 
-//private const val previewHeight = 835
-//private const val previewWidth = 375
-////private const val previewHeight = 375
-////private const val previewWidth = 835
-//
-//@Preview(showBackground = false, widthDp = previewWidth, heightDp = previewHeight)
-//@Composable
-//fun GameScreenPreview() {
-//    DevilitionTheme(darkTheme = true) {
-//        Box(
-//            modifier = Modifier
-//                .size(height = previewHeight.dp, width = previewWidth.dp)
-//                .background(MaterialTheme.colorScheme.background)
-//        ) {
-//            GameScreen()
-//        }
-//    }
-//}
+private const val previewHeight = 835
+private const val previewWidth = 375
+//private const val previewHeight = 375
+//private const val previewWidth = 835
+
+@Preview(showBackground = false, widthDp = previewWidth, heightDp = previewHeight)
+@Composable
+fun GameScreenPreview() {
+    val gameViewModel = viewModel<GameViewModel>(
+        factory = GameViewModelFactory(MockGameRepository())
+    )
+
+    DevilitionTheme(darkTheme = true) {
+        Box(
+            modifier = Modifier
+                .size(height = previewHeight.dp, width = previewWidth.dp)
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            GameScreen(gameViewModel)
+        }
+    }
+}

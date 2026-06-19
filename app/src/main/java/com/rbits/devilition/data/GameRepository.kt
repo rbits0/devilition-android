@@ -8,19 +8,30 @@ import androidx.datastore.core.Serializer
 import com.rbits.devilition.TAG
 import com.rbits.devilition.ui.GameState
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import java.io.InputStream
 import java.io.OutputStream
+import kotlin.collections.listOf
+
+interface IGameRepository {
+    val gameFlow: Flow<GameState>
+    val pastGamesFlow: Flow<List<GameState>>
+
+    suspend fun updateState(state: GameState)
+    suspend fun addPastGame(gameState: GameState)
+}
 
 class GameRepository(
     private val gameStore: DataStore<GameState>,
     private val pastGamesStore: DataStore<List<GameState>>,
-) {
+) : IGameRepository {
 
-    val gameFlow = gameStore.data
+    override val gameFlow = gameStore.data
         .catch { exception ->
             if (exception is IOException) {
                 Log.e(TAG, "Error reading gameState")
@@ -30,7 +41,7 @@ class GameRepository(
             }
         }
 
-    val pastGamesFlow = pastGamesStore.data
+    override val pastGamesFlow = pastGamesStore.data
         .catch { exception ->
             if (exception is IOException) {
                 Log.e(TAG, "Error reading past games")
@@ -40,11 +51,11 @@ class GameRepository(
             }
         }
 
-    suspend fun updateState(state: GameState) {
+    override suspend fun updateState(state: GameState) {
         gameStore.updateData { state }
     }
 
-    suspend fun addPastGame(gameState: GameState) {
+    override suspend fun addPastGame(gameState: GameState) {
         pastGamesStore.updateData { pastGames ->
             pastGames + gameState
         }
@@ -93,4 +104,12 @@ object PastGamesSerializer : Serializer<List<GameState>> {
             )
         }
     }
+}
+
+class MockGameRepository : IGameRepository {
+    override val gameFlow = flowOf(GameState.new())
+    override val pastGamesFlow = flowOf(listOf<GameState>())
+
+    override suspend fun updateState(state: GameState) {}
+    override suspend fun addPastGame(gameState: GameState) {}
 }

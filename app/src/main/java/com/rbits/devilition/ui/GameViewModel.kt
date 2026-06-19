@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
-import com.rbits.devilition.data.GameRepository
+import com.rbits.devilition.data.IGameRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +20,7 @@ const val SECONDS_UPDATE_THRESHOLD = 10
 
 // Should theoretically be safe to update from multiple threads
 class GameViewModel(
-    private val repository: GameRepository,
+    private val repository: IGameRepository,
 ) : ViewModel() {
     // This uses a MutableStateFlow and updates the repository every time it is modified
     // We do this because repository is too slow to update the values, which means the UI doesn't
@@ -150,7 +150,7 @@ class GameViewModel(
     }
 }
 
-class GameViewModelFactory(private val repository: GameRepository)
+class GameViewModelFactory(private val repository: IGameRepository)
     : ViewModelProvider.Factory
 {
     override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {

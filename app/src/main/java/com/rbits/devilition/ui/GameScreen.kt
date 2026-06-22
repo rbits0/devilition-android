@@ -4,11 +4,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -133,8 +135,17 @@ fun GameScreen(
                 itemUsableHeight / GRID_HEIGHT
             }
 
-            Column(
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+            // We're using this instead of FlexBox because FlexBox has some weird bugs with layout
+            RowOrColumn(
+                direction = (
+                    if (isGridMaxWidth) {
+                        RowOrColumnDirection.Column
+                    } else {
+                        RowOrColumnDirection.Row
+                    }
+                ),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 GameGrid(
                     gameState.grid,
@@ -146,6 +157,9 @@ fun GameScreen(
                     selectedForDetonation = selectedForDetonation,
                     targetedCells = targetedCells,
                     onItemClicked = { onItemClicked(it) },
+                    modifier = Modifier
+                        .width(IntrinsicSize.Min)
+                        .weight(1f, false),
                 )
 
                 Hand(
@@ -174,21 +188,27 @@ fun GameScreen(
                         detonateStarted = false
                         selectedForDetonation = null
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
+                    modifier = (
+                        if (isGridMaxWidth) {
+                            Modifier.fillMaxWidth()
+                        } else {
+                            Modifier.fillMaxHeight()
+                        }
+                    )
                 )
 
-                if (gameState.stage == GameStage.LOSE) {
-                    WinLoseDialog(
-                        onDismiss = { gameViewModel.reset() },
-                        text = stringResource(R.string.lose, gameState.score()),
-                    )
-                } else if (gameState.stage == GameStage.WIN) {
-                    WinLoseDialog(
-                        onDismiss = { gameViewModel.reset() },
-                        text = stringResource(R.string.win, gameState.score()),
-                    )
-                }
+            }
+
+            if (gameState.stage == GameStage.LOSE) {
+                WinLoseDialog(
+                    onDismiss = { gameViewModel.reset() },
+                    text = stringResource(R.string.lose, gameState.score()),
+                )
+            } else if (gameState.stage == GameStage.WIN) {
+                WinLoseDialog(
+                    onDismiss = { gameViewModel.reset() },
+                    text = stringResource(R.string.win, gameState.score()),
+                )
             }
         }
     }

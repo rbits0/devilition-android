@@ -3,10 +3,8 @@ package com.rbits.devilition.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,14 +28,12 @@ fun GameGrid(
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(GRID_SPACING_DP.dp),
-        modifier = modifier
-            .width(IntrinsicSize.Max),
+        modifier = modifier,
     ) {
         gridState.withIndex().forEach { (rowIndex, row) ->
             Row(
                 horizontalArrangement = Arrangement.spacedBy(GRID_SPACING_DP.dp),
                 modifier = Modifier
-                    .weight(1f, fill = false),
             ) {
                 row.withIndex().forEach { (colIndex, item) ->
                     GridCell(

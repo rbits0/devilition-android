@@ -209,6 +209,7 @@ data class GameState(
 
     fun roundStart() {
         round += 1
+        numAvailablePieces += piecesPerRound(round)
 
         if (round < NUM_ROUNDS) {
             healDemons()
@@ -243,7 +244,6 @@ data class GameState(
             placeRandomHoles(numHoles)
         }
 
-        numAvailablePieces += piecesPerRound(round)
         stage = GameStage.PLACING_PIECES
     }
 

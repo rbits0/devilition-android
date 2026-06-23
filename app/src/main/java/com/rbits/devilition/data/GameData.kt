@@ -1,5 +1,6 @@
 package com.rbits.devilition.data
 
+import androidx.annotation.IntRange
 import com.rbits.devilition.ui.DemonType
 import com.rbits.devilition.ui.PieceType
 
@@ -27,12 +28,13 @@ fun demonsPerRound(round: Int): Map<DemonType, Int>  =
         8 -> mapOf(DemonType.MINOR to 9, DemonType.MAJOR to 3, DemonType.ELDER to 3)
         else -> mapOf(DemonType.MINOR to 9, DemonType.MAJOR to 3, DemonType.ELDER to 4)
     }
-fun piecesPerRound(round: Int): Int =
+fun piecesPerRound(@IntRange(1, 10) round: Int): Int =
     when (round) {
         1, 2, 5, 8, 9 -> 15
         3, 6 -> 10
         4, 7 -> 20
-        else -> 0
+        10 -> 13
+        else -> throw IndexOutOfBoundsException("Round must be between 1 and 10")
     }
 
 fun demonTypeHealth(demonType: DemonType): Int =

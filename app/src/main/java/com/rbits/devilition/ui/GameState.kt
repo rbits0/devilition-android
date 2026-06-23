@@ -470,7 +470,13 @@ data class GameState(
         }
 
         if (round == NUM_ROUNDS) {
-            stage = GameStage.WIN
+            // There can't be any demons left after the final round
+            stage = if (numDemons == 0) {
+                GameStage.WIN
+            } else {
+                GameStage.LOSE
+            }
+
             return
         }
 

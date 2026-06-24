@@ -34,6 +34,7 @@ fun GameGrid(
             Row(
                 horizontalArrangement = Arrangement.spacedBy(GRID_SPACING_DP.dp),
                 modifier = Modifier
+                    .weight(1f, false),
             ) {
                 row.withIndex().forEach { (colIndex, item) ->
                     GridCell(

@@ -763,6 +763,6 @@ fun rotatePos(
 fun formatSeconds(seconds: Int): String = String.format(
     Locale.ENGLISH,
     "%02d:%02d",
+    seconds / 60,
     seconds % 60,
-    (seconds / 60)
 )

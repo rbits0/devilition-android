@@ -230,9 +230,9 @@ data class GameState(
             }
 
             // Replace 4x4 square in middle with holes
-            // All spots from (2, 2) to (5, 5)
+            // All spots from (2, 3) to (5, 6)
             for (rowIndex in 2..5) {
-                for (colIndex in 2..5) {
+                for (colIndex in 3..6) {
                     grid[rowIndex][colIndex] = GridItem.Hole()
                 }
             }
@@ -293,7 +293,7 @@ data class GameState(
     // Place boss in middle
     // Boss takes up a 2x2 space
     fun placeBoss() {
-        val bossPos = PiecePos.GridPos(3, 3)
+        val bossPos = PiecePos.GridPos(3, 4)
 
         grid[bossPos.x][bossPos.y] = GridItem.Demon(
             demonType = DemonType.BOSS,
@@ -301,9 +301,9 @@ data class GameState(
             maxHealth = demonTypeHealth(DemonType.BOSS),
         )
         for (pos in listOf(
-            PiecePos.GridPos(3, 4),
-            PiecePos.GridPos(4, 3),
+            PiecePos.GridPos(3, 5),
             PiecePos.GridPos(4, 4),
+            PiecePos.GridPos(4, 5),
         )) {
             grid[pos.x][pos.y] = GridItem.BossHitbox(bossPos)
         }

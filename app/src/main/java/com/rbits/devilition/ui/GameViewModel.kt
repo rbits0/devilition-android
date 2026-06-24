@@ -97,6 +97,9 @@ class GameViewModel(
         viewModelScope.launch {
             repository.updateState(newValue)
         }
+
+        stopTimer()
+        startTimer()
     }
 
     fun addToPastGames() {

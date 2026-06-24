@@ -9,4 +9,5 @@
     <string name="close_dialog">Ok</string>
     <string name="lose">You lose! Your score is %1$d</string>
     <string name="win">You win! Your score is %1$d</string>
+    <string name="piece_count">Pieces: %1$d</string>
 </resources>

@@ -61,7 +61,7 @@ fun Hand(
         ) {
 
             Text(
-                "Pieces: $numAvailablePieces",
+                stringResource(R.string.piece_count, numAvailablePieces),
                 style = MaterialTheme.typography.titleLarge,
             )
 

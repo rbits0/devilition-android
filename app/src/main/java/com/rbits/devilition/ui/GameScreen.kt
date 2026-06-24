@@ -165,6 +165,8 @@ fun GameScreen(
                 Hand(
                     handState = gameState.hand,
                     numAvailablePieces = gameState.numAvailablePieces,
+                    round = gameState.round,
+                    seconds = gameState.seconds,
                     dragAndDropState = dragAndDropState,
                     cellSize = cellSize,
                     dragEnabled = (

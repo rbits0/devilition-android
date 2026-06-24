@@ -12,6 +12,7 @@ import com.rbits.devilition.data.demonsPerRound
 import com.rbits.devilition.data.piecesPerRound
 import com.rbits.devilition.data.tierPieces
 import kotlinx.serialization.Serializable
+import java.util.Locale
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.math.max
@@ -758,3 +759,10 @@ fun rotatePos(
     Direction.LEFT -> ExplosionPos.RelativePos(-pos.y, pos.x)
     Direction.RIGHT -> ExplosionPos.RelativePos(pos.y, -pos.x)
 }
+
+fun formatSeconds(seconds: Int): String = String.format(
+    Locale.ENGLISH,
+    "%02d:%02d",
+    seconds % 60,
+    (seconds / 60)
+)

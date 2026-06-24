@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,12 +26,15 @@ import com.mohamedrejeb.compose.dnd.DragAndDropState
 import com.mohamedrejeb.compose.dnd.drag.DraggableItem
 import com.mohamedrejeb.compose.dnd.rememberDragAndDropState
 import com.rbits.devilition.R
+import com.rbits.devilition.data.NUM_ROUNDS
 import com.rbits.devilition.ui.theme.DevilitionTheme
 
 @Composable
 fun Hand(
     handState: Array<GridItem.Piece?>,
     numAvailablePieces: Int,
+    round: Int,
+    seconds: Int,
     dragAndDropState: DragAndDropState<GridItem.Piece>,
     cellSize: Dp,
     dragEnabled: Boolean,
@@ -59,6 +63,26 @@ fun Hand(
             modifier = Modifier
                 .padding(10.dp)
         ) {
+
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxWidth(),
+            ) {
+                Text(
+                    formatSeconds(seconds),
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+
+                Text(
+                    stringResource(
+                        R.string.round_count,
+                        round,
+                        NUM_ROUNDS,
+                    ),
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+            }
 
             Text(
                 stringResource(R.string.piece_count, numAvailablePieces),
@@ -173,6 +197,8 @@ fun HandPreview() {
                     position = PiecePos.HandPos(i)
                 )},
                 numAvailablePieces = 15,
+                round = 1,
+                seconds = 0,
                 dragAndDropState = rememberDragAndDropState(),
                 cellSize = 30.dp,
                 dragEnabled = true,

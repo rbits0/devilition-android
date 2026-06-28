@@ -21,6 +21,7 @@ fun GameGrid(
     dragAndDropState: DragAndDropState<GridItem.Piece>,
     detonateStarted: Boolean,
     selectedForDetonation: GridItem.Piece?,
+    armedCells: Set<PiecePos.GridPos>,
     onItemDropped: (GridItem.Piece, PiecePos.GridPos) -> Unit,
     onItemClicked: (GridItem.Piece) -> Unit,
     modifier: Modifier = Modifier,
@@ -37,20 +38,23 @@ fun GameGrid(
                     .weight(1f, false),
             ) {
                 row.withIndex().forEach { (colIndex, item) ->
+                    val position = PiecePos.GridPos(rowIndex, colIndex)
+
                     GridCell(
                         dragAndDropState,
-                        position = PiecePos.GridPos(rowIndex, colIndex),
+                        position = position,
                         item = item,
                         detonateStarted = detonateStarted,
                         selectedForDetonation = item == selectedForDetonation,
                         onItemDropped = { item ->
-                            onItemDropped(item, PiecePos.GridPos(rowIndex, colIndex))
+                            onItemDropped(item, position)
                         },
                         onItemClicked = onItemClicked,
                         targeted = (
-                            targetedCells?.contains(PiecePos.GridPos(rowIndex, colIndex))
+                            targetedCells?.contains(position)
                                 ?: false
                         ),
+                        armed = armedCells.contains(position),
                         modifier = Modifier
                             .weight(1f),
                     )
@@ -91,6 +95,7 @@ fun GameGridPreview() {
                 rememberDragAndDropState(),
                 detonateStarted = false,
                 selectedForDetonation = null,
+                armedCells = setOf(),
                 onItemDropped = {_, _ -> },
                 onItemClicked = {},
                 modifier = Modifier,

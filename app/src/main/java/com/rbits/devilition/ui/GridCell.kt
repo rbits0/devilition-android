@@ -32,6 +32,7 @@ fun GridCell(
     modifier: Modifier = Modifier,
     item: GridItem? = null,
     targeted: Boolean = false,
+    armed: Boolean = false,
 ) {
     var isHoveredOver by remember { mutableStateOf(false) }
 
@@ -99,6 +100,7 @@ fun GridCell(
                         clickEnabled = true,
                         highlighted = true,
                         targeted = targeted,
+                        armed = armed,
                         modifier = Modifier
                             .graphicsLayer {
                                 alpha = if (isDragging) 0f else 1f
@@ -113,6 +115,7 @@ fun GridCell(
                     clickEnabled = detonateStarted,
                     highlighted = selectedForDetonation,
                     targeted = targeted,
+                    armed = armed,
                 )
             } else {
                 // Non-piece

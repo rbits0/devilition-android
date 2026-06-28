@@ -155,6 +155,9 @@ fun GameScreen(
                     },
                     detonateStarted = detonateStarted,
                     selectedForDetonation = selectedForDetonation,
+                    armedCells = gameState.armedPieces.mapNotNullTo(mutableSetOf()) {
+                        piece -> piece.position as? PiecePos.GridPos
+                    },
                     targetedCells = targetedCells,
                     onItemClicked = { onItemClicked(it) },
                     modifier = Modifier

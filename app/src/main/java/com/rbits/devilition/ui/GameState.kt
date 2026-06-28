@@ -595,7 +595,7 @@ data class GameState(
         }
 
         // Convert the relative cell positions to fixed GridPos
-        val gridCellsToExplode = cellsToExplode.mapTo(mutableSetOf()) { pos ->
+        var gridCellsToExplode = cellsToExplode.mapTo(mutableSetOf()) { pos ->
             when (pos) {
                 is ExplosionPos.RelativePos -> {
                     val rotatedPos = rotatePos(pos, item.facing)
@@ -610,10 +610,25 @@ data class GameState(
         }
 
         // Remove any out of bounds position
-        return gridCellsToExplode.filterTo(mutableSetOf()){ pos ->
+        gridCellsToExplode = gridCellsToExplode.filterTo(mutableSetOf()){ pos ->
             pos.x in 0..<GRID_HEIGHT
                 && pos.y in 0..<GRID_WIDTH
         }
+
+        // Target Boss instead of BossHitbox
+        val bossHitboxes = gridCellsToExplode
+            .filter { pos -> grid[pos.x][pos.y] is GridItem.BossHitbox }
+            .toSet()
+        if (bossHitboxes.isNotEmpty()) {
+            val bossPos = (
+                grid[bossHitboxes.first().x][bossHitboxes.first().y] as GridItem.BossHitbox
+            ).bossPos
+            gridCellsToExplode.add(bossPos)
+        }
+        gridCellsToExplode.removeAll(bossHitboxes)
+
+        Log.i(TAG, "$gridCellsToExplode")
+        return gridCellsToExplode
     }
 
     private fun explodeCell(pos: PiecePos.GridPos) {

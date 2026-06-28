@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -61,6 +62,19 @@ fun GridCell(
         shape = RoundedCornerShape(6.dp),
         modifier = modifier
             .aspectRatio(1f)
+            .let {
+                if (item is GridItem.Demon && item.demonType == DemonType.BOSS) {
+                    // Make boss demon take up a 2x2 space
+                    it.graphicsLayer {
+                        val scale = 2f + (GRID_SPACING_DP.dp.toPx() / size.width)
+                        transformOrigin = TransformOrigin(0f, 0f)
+                        scaleX = scale
+                        scaleY = scale
+                    }
+                } else {
+                    it
+                }
+            }
             .dropTarget(
                 state = dragAndDropState,
                 key = position,

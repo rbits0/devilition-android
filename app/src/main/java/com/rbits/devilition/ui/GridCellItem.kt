@@ -15,8 +15,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -74,10 +77,11 @@ fun GridCellItem(
         ) {
             if (item is SpriteItem) {
                 Image(
-                    painter = painterResource(getImageId(item)),
+                    bitmap = ImageBitmap.imageResource(getImageId(item)),
                     contentDescription = stringResource(R.string.snake),
                     contentScale = ContentScale.Fit,
                     alignment = Alignment.BottomCenter,
+                    filterQuality = FilterQuality.None,
                     modifier = Modifier
                         .fillMaxSize()
 //                        .background(Color.Red)

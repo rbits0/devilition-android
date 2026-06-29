@@ -16,6 +16,8 @@ import java.util.Locale
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.math.max
+import kotlin.math.round
+import kotlin.math.roundToInt
 
 enum class DemonType {
     MINOR,
@@ -488,13 +490,19 @@ data class GameState(
         stage = GameStage.ROUND_START
     }
 
-    fun score(): Int {
+    fun score(includeTimeBonus: Boolean = true): Int {
         val numPiecesAndTownies = grid.flatten().count {
             it is GridItem.Piece || it is GridItem.Townie
         }
-        val score = 10_000 + (numPiecesAndTownies + numAvailablePieces) * 1_000
+        val leftoverPieceBonus = (numPiecesAndTownies + numAvailablePieces) * 1_000
+        val minutes = (seconds / 60f).roundToInt()
+        val timeBonus = max(15_000 - (250 * minutes), 0)
 
-        // TODO: Time bonus
+        var score = 10_000 + leftoverPieceBonus
+        if (includeTimeBonus) {
+            score += timeBonus
+        }
+
         return score
     }
 

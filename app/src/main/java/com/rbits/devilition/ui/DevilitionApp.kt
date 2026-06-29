@@ -2,15 +2,9 @@ package com.rbits.devilition.ui
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fitInside
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarDefaults
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteItem
@@ -58,6 +52,7 @@ fun DevilitionApp(
     val navigationSuiteState = rememberNavigationSuiteScaffoldState()
     val wideNavigationRailState = rememberWideNavigationRailState()
     val gameState by gameViewModel.gameState.collectAsStateWithLifecycle()
+    val pastGamesState by gameViewModel.pastGamesState.collectAsStateWithLifecycle()
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val navigationSuiteType = if (windowSizeClass.isWidthAtLeastBreakpoint(
             WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND
@@ -119,6 +114,7 @@ fun DevilitionApp(
                         )
 
                         Destination.Scores -> ScoresScreen(
+                            pastGames = pastGamesState,
                             modifier = Modifier
                                 .fitInside(WindowInsetsRulers.SafeDrawing.current),
                         )

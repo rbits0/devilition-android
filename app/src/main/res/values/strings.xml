@@ -14,4 +14,8 @@
     <string name="game_screen">Game</string>
     <string name="scores">Scores</string>
     <string name="settings">Settings</string>
+    <string name="highscore">High Score</string>
+    <string name="games_played">Games Played</string>
+    <string name="games_won">Games Won</string>
+    <string name="games_lost">Games Lost</string>
 </resources>

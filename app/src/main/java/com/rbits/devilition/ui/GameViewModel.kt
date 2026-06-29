@@ -8,8 +8,10 @@ import com.rbits.devilition.data.IGameRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
@@ -28,6 +30,11 @@ class GameViewModel(
 
     private val _gameState = MutableStateFlow(GameState())
     val gameState = _gameState.asStateFlow()
+    val pastGamesState = repository.pastGamesFlow.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = listOf(),
+    )
     private var timerJob: Job? = null
 
     // Initialise the state from the repository

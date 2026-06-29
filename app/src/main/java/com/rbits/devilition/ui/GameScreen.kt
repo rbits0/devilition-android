@@ -42,11 +42,22 @@ const val DETONATION_STEP_TIME_MS = 1000L
 
 @Composable
 fun GameScreen(
-    gameViewModel: GameViewModel,
+    gameState: GameState,
+    roundStart: () -> Unit,
+    movePiece: (GridItem.Piece, PiecePos.GridPos) -> Unit,
+    rotatePiece: (GridItem.Piece) -> Unit,
+    confirmPlacement: () -> Unit,
+    cancelPlacement: () -> Unit,
+    armPiece: (GridItem.Piece) -> GameState,
+    runDetonationStep: () -> GameState,
+    roundEnd: () -> GameState,
+    reset: () -> Unit,
+    addToPastGames: () -> Unit,
+    startTimer: () -> Unit,
+    stopTimer: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scope = rememberCoroutineScope()
-    val gameState by gameViewModel.gameState.collectAsStateWithLifecycle()
     val dragAndDropState = rememberDragAndDropState<GridItem.Piece>()
     var detonateStarted by remember { mutableStateOf(false) }
     var selectedForDetonation: GridItem.Piece? by remember { mutableStateOf(null) }
@@ -72,18 +83,18 @@ fun GameScreen(
     } }
 
     LifecycleEventEffect(Lifecycle.Event.ON_START) {
-        gameViewModel.startTimer()
+        startTimer()
     }
 
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) {
-        gameViewModel.stopTimer()
+        stopTimer()
     }
 
     fun onItemClicked(item: GridItem.Piece) {
         if (detonateStarted) {
             selectedForDetonation = item
         } else {
-            gameViewModel.rotatePiece(item)
+            rotatePiece(item)
         }
     }
 
@@ -94,21 +105,21 @@ fun GameScreen(
 
         scope.launch {
             // gameState doesn't immediately update, so this keeps the up-to-date value
-            var currentState = gameViewModel.armPiece(selected)
+            var currentState = armPiece(selected)
 
             while (currentState.stage == GameStage.DETONATION) {
                 delay(DETONATION_STEP_TIME_MS)
-                currentState = gameViewModel.runDetonationStep()
+                currentState = runDetonationStep()
             }
 
-            currentState = gameViewModel.roundEnd()
+            currentState = roundEnd()
             when (currentState.stage) {
                 GameStage.ROUND_START -> {
                     delay(DETONATION_STEP_TIME_MS)
-                    gameViewModel.roundStart()
+                    roundStart()
                 }
                 GameStage.WIN, GameStage.LOSE -> {
-                    gameViewModel.addToPastGames()
+                    addToPastGames()
                 }
                 else -> {}
             }
@@ -150,9 +161,7 @@ fun GameScreen(
                 GameGrid(
                     gameState.grid,
                     dragAndDropState,
-                    onItemDropped = { item, position ->
-                        gameViewModel.movePiece(item, position)
-                    },
+                    onItemDropped = movePiece,
                     detonateStarted = detonateStarted,
                     selectedForDetonation = selectedForDetonation,
                     armedCells = gameState.armedPieces.mapNotNullTo(mutableSetOf()) {
@@ -180,11 +189,9 @@ fun GameScreen(
                     startDetonateEnabled = gameState.unconfirmedPiece== null,
                     detonateStarted = detonateStarted,
                     confirmDetonateEnabled = selectedForDetonation != null,
-                    onItemRotated = { item ->
-                        gameViewModel.rotatePiece(item)
-                    },
-                    onConfirmPlacement = { gameViewModel.confirmPlacement() },
-                    onCancelPlacement = { gameViewModel.cancelPlacement() },
+                    onItemRotated = rotatePiece,
+                    onConfirmPlacement = confirmPlacement,
+                    onCancelPlacement = cancelPlacement,
                     onStartDetonate = {
                         detonateStarted = true
                     },
@@ -206,12 +213,12 @@ fun GameScreen(
 
             if (gameState.stage == GameStage.LOSE) {
                 WinLoseDialog(
-                    onDismiss = { gameViewModel.reset() },
+                    onDismiss = reset,
                     text = stringResource(R.string.lose, gameState.score()),
                 )
             } else if (gameState.stage == GameStage.WIN) {
                 WinLoseDialog(
-                    onDismiss = { gameViewModel.reset() },
+                    onDismiss = reset,
                     text = stringResource(R.string.win, gameState.score()),
                 )
             }
@@ -231,6 +238,7 @@ fun GameScreenPreview() {
     val gameViewModel = viewModel<GameViewModel>(
         factory = GameViewModelFactory(MockGameRepository())
     )
+    val gameState by gameViewModel.gameState.collectAsStateWithLifecycle()
 
     DevilitionTheme(darkTheme = true) {
         Box(
@@ -238,7 +246,21 @@ fun GameScreenPreview() {
                 .size(height = previewHeight.dp, width = previewWidth.dp)
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            GameScreen(gameViewModel)
+            GameScreen(
+                gameState,
+                roundStart = gameViewModel::roundStart,
+                movePiece = gameViewModel::movePiece,
+                rotatePiece = gameViewModel::rotatePiece,
+                confirmPlacement = gameViewModel::confirmPlacement,
+                cancelPlacement = gameViewModel::cancelPlacement,
+                armPiece = gameViewModel::armPiece,
+                runDetonationStep = gameViewModel::runDetonationStep,
+                roundEnd = gameViewModel::roundEnd,
+                reset = gameViewModel::reset,
+                addToPastGames = gameViewModel::addToPastGames,
+                startTimer = gameViewModel::startTimer,
+                stopTimer = gameViewModel::stopTimer,
+            )
         }
     }
 }

@@ -214,12 +214,20 @@ fun GameScreen(
             if (gameState.stage == GameStage.LOSE) {
                 WinLoseDialog(
                     onDismiss = reset,
-                    text = stringResource(R.string.lose, gameState.score()),
+                    text = stringResource(
+                        R.string.lose,
+                        gameState.score(),
+                        gameState.score(false),
+                    ),
                 )
             } else if (gameState.stage == GameStage.WIN) {
                 WinLoseDialog(
                     onDismiss = reset,
-                    text = stringResource(R.string.win, gameState.score()),
+                    text = stringResource(
+                        R.string.win,
+                        gameState.score(),
+                        gameState.score(false),
+                    ),
                 )
             }
         }

@@ -3,6 +3,7 @@ package com.rbits.devilition.ui
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fitInside
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -11,18 +12,26 @@ import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteItem
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
+import androidx.compose.material3.adaptive.navigationsuite.rememberNavigationSuiteScaffoldState
+import androidx.compose.material3.rememberWideNavigationRailState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.WindowInsetsRulers
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.window.core.layout.WindowSizeClass
 import com.rbits.devilition.R
 
 
@@ -46,66 +55,81 @@ fun DevilitionApp(
 ) {
     val navController = rememberNavController()
     var selectedDestination by remember { mutableStateOf(Destination.Game) }
+    val navigationSuiteState = rememberNavigationSuiteScaffoldState()
+    val wideNavigationRailState = rememberWideNavigationRailState()
     val gameState by gameViewModel.gameState.collectAsStateWithLifecycle()
+    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+    val navigationSuiteType = if (windowSizeClass.isWidthAtLeastBreakpoint(
+            WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND
+        )) {
+            NavigationSuiteType.NavigationRail
+        } else {
+            NavigationSuiteType.NavigationBar
+        }
 
-
-    Scaffold(
-        bottomBar = {
-            NavigationBar(windowInsets = NavigationBarDefaults.windowInsets) {
-                for (destination in Destination.entries) {
-                    NavigationBarItem(
-                        selected = selectedDestination == destination,
-                        onClick = {
-                            navController.navigate(destination.route)
-                            selectedDestination = destination
-                        },
-                        icon = {
-                            Icon(
-                                painter = painterResource(destination.icon),
-                                contentDescription = stringResource(destination.label),
-                            )
-                        },
-                        label = {
-                            Text(
-                                stringResource(destination.label),
-                                style = MaterialTheme.typography.labelMedium,
-                            )
-                        },
-                    )
-                }
+    NavigationSuiteScaffold(
+        state = navigationSuiteState,
+        navigationSuiteType = navigationSuiteType,
+        navigationItems = {
+            for (destination in Destination.entries) {
+                NavigationSuiteItem(
+                    selected = selectedDestination == destination,
+                    onClick = {
+                        navController.navigate(destination.route)
+                        selectedDestination = destination
+                    },
+                    icon = {
+                        Icon(
+                            painter = painterResource(destination.icon),
+                            contentDescription = stringResource(destination.label),
+                        )
+                    },
+                    label = {
+                        Text(
+                            stringResource(destination.label),
+                            style = MaterialTheme.typography.labelMedium,
+                        )
+                    },
+                    navigationSuiteType = navigationSuiteType,
+                )
             }
         },
-        modifier = modifier.fillMaxSize(),
-    ) { innerPadding ->
+    ) {
         NavHost(navController = navController, startDestination = Destination.Game.route) {
             for (destination in Destination.entries) {
                 composable(destination.route) {
                     when(destination) {
 
                         Destination.Game -> GameScreen(
-                                gameState,
-                                roundStart = gameViewModel::roundStart,
-                                movePiece = gameViewModel::movePiece,
-                                rotatePiece = gameViewModel::rotatePiece,
-                                confirmPlacement = gameViewModel::confirmPlacement,
-                                cancelPlacement = gameViewModel::cancelPlacement,
-                                armPiece = gameViewModel::armPiece,
-                                runDetonationStep = gameViewModel::runDetonationStep,
-                                roundEnd = gameViewModel::roundEnd,
-                                reset = gameViewModel::reset,
-                                addToPastGames = gameViewModel::addToPastGames,
-                                startTimer = gameViewModel::startTimer,
-                                stopTimer = gameViewModel::stopTimer,
-                                modifier = Modifier.padding(innerPadding),
-                            )
+                            gameState,
+                            roundStart = gameViewModel::roundStart,
+                            movePiece = gameViewModel::movePiece,
+                            rotatePiece = gameViewModel::rotatePiece,
+                            confirmPlacement = gameViewModel::confirmPlacement,
+                            cancelPlacement = gameViewModel::cancelPlacement,
+                            armPiece = gameViewModel::armPiece,
+                            runDetonationStep = gameViewModel::runDetonationStep,
+                            roundEnd = gameViewModel::roundEnd,
+                            reset = gameViewModel::reset,
+                            addToPastGames = gameViewModel::addToPastGames,
+                            startTimer = gameViewModel::startTimer,
+                            stopTimer = gameViewModel::stopTimer,
+                            modifier = Modifier
+                                .fitInside(WindowInsetsRulers.SafeDrawing.current),
+                        )
 
-                        Destination.Scores -> ScoresScreen()
+                        Destination.Scores -> ScoresScreen(
+                            modifier = Modifier
+                                .fitInside(WindowInsetsRulers.SafeDrawing.current),
+                        )
 
-                        Destination.Settings -> SettingsScreen()
+                        Destination.Settings -> SettingsScreen(
+                            modifier = Modifier
+                                .fitInside(WindowInsetsRulers.SafeDrawing.current),
+                        )
 
                     }
                 }
-
             }
         }
     }

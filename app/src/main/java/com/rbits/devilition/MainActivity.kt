@@ -5,22 +5,17 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.datastore.core.DataStore
 import androidx.datastore.dataStore
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.rbits.devilition.data.GameRepository
 import com.rbits.devilition.data.GameStateSerializer
 import com.rbits.devilition.data.PastGamesSerializer
-import com.rbits.devilition.ui.GameScreen
+import com.rbits.devilition.ui.DevilitionApp
 import com.rbits.devilition.ui.GameState
 import com.rbits.devilition.ui.GameViewModel
 import com.rbits.devilition.ui.GameViewModelFactory
@@ -53,27 +48,8 @@ class MainActivity : ComponentActivity() {
         )[GameViewModel::class]
 
         setContent {
-            val gameState by gameViewModel.gameState.collectAsStateWithLifecycle()
-
             DevilitionTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    GameScreen(
-                        gameState,
-                        roundStart = gameViewModel::roundStart,
-                        movePiece = gameViewModel::movePiece,
-                        rotatePiece = gameViewModel::rotatePiece,
-                        confirmPlacement = gameViewModel::confirmPlacement,
-                        cancelPlacement = gameViewModel::cancelPlacement,
-                        armPiece = gameViewModel::armPiece,
-                        runDetonationStep = gameViewModel::runDetonationStep,
-                        roundEnd = gameViewModel::roundEnd,
-                        reset = gameViewModel::reset,
-                        addToPastGames = gameViewModel::addToPastGames,
-                        startTimer = gameViewModel::startTimer,
-                        stopTimer = gameViewModel::stopTimer,
-                        modifier = Modifier.padding(innerPadding),
-                    )
-                }
+                DevilitionApp(gameViewModel = gameViewModel)
             }
         }
     }

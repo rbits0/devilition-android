@@ -45,6 +45,7 @@ enum class Destination(
 @Composable
 fun DevilitionApp(
     gameViewModel: GameViewModel,
+    settingsViewModel: SettingsViewModel,
     modifier: Modifier = Modifier,
 ) {
     val navController = rememberNavController()
@@ -120,6 +121,7 @@ fun DevilitionApp(
                         )
 
                         Destination.Settings -> SettingsScreen(
+                            settingsViewModel = settingsViewModel,
                             modifier = Modifier
                                 .fitInside(WindowInsetsRulers.SafeDrawing.current),
                         )

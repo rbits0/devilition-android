@@ -36,9 +36,10 @@ import com.rbits.devilition.data.MockGameRepository
 import com.rbits.devilition.ui.theme.DevilitionTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.seconds
 
 const val GRID_SPACING_DP = 2
-const val DETONATION_STEP_TIME_MS = 1000L
+val DETONATION_STEP_TIME = 1.seconds
 
 @Composable
 fun GameScreen(
@@ -108,14 +109,14 @@ fun GameScreen(
             var currentState = armPiece(selected)
 
             while (currentState.stage == GameStage.DETONATION) {
-                delay(DETONATION_STEP_TIME_MS)
+                delay(DETONATION_STEP_TIME)
                 currentState = runDetonationStep()
             }
 
             currentState = roundEnd()
             when (currentState.stage) {
                 GameStage.ROUND_START -> {
-                    delay(DETONATION_STEP_TIME_MS)
+                    delay(DETONATION_STEP_TIME)
                     roundStart()
                 }
                 GameStage.WIN, GameStage.LOSE -> {

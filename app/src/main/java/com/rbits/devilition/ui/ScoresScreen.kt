@@ -17,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.rbits.devilition.LIST_SCREEN_PADDING_DP
 import com.rbits.devilition.R
+import com.rbits.devilition.TITLE_BOTTOM_PADDING_DP
 import com.rbits.devilition.ui.theme.DevilitionTheme
 
 @Composable
@@ -46,6 +47,16 @@ fun ScoresScreen(
         modifier = modifier
             .padding(LIST_SCREEN_PADDING_DP.dp)
     ) {
+        item {
+            Text(
+                stringResource(R.string.scores),
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(
+                    bottom = TITLE_BOTTOM_PADDING_DP.dp - ListItemDefaults.SegmentedGap,
+                )
+            )
+        }
+
         item {
             SegmentedListItem (
                 shapes = ListItemDefaults.segmentedShapes(0, numListItems),

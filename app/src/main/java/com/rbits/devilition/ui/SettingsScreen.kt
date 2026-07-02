@@ -15,6 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.rbits.devilition.LIST_SCREEN_PADDING_DP
 import com.rbits.devilition.R
+import com.rbits.devilition.TITLE_BOTTOM_PADDING_DP
 import com.rbits.devilition.data.Settings
 import com.rbits.devilition.ui.theme.DevilitionTheme
 
@@ -33,6 +34,16 @@ fun SettingsScreen(
         verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
         modifier = modifier.padding(LIST_SCREEN_PADDING_DP.dp),
     ) {
+        item {
+            Text(
+                stringResource(R.string.settings),
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(
+                    bottom = TITLE_BOTTOM_PADDING_DP.dp - ListItemDefaults.SegmentedGap,
+                )
+            )
+        }
+
         item {
             SegmentedListItem (
                 checked = settings.timeBonusEnabled,

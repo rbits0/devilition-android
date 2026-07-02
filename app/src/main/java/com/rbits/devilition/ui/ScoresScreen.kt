@@ -23,15 +23,13 @@ import com.rbits.devilition.ui.theme.DevilitionTheme
 @Composable
 fun ScoresScreen(
     pastGames: List<GameState>,
+    timeBonusEnabled: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
-    // TODO: Add setting for time bonus
-    val includeTimeBonus = true
-
     val highscore = remember {
         pastGames
             .filter {it.stage == GameStage.WIN }
-            .maxOfOrNull { it.score(includeTimeBonus) }
+            .maxOfOrNull { it.score(timeBonusEnabled) }
     }
     val gamesPlayed = pastGames.count()
     val gamesWon = pastGames.count { it.stage == GameStage.WIN }

@@ -57,6 +57,7 @@ fun GameScreen(
     startTimer: () -> Unit,
     stopTimer: () -> Unit,
     modifier: Modifier = Modifier,
+    timeBonusEnabled: Boolean = true,
 ) {
     val scope = rememberCoroutineScope()
     val dragAndDropState = rememberDragAndDropState<GridItem.Piece>()
@@ -217,8 +218,7 @@ fun GameScreen(
                     onDismiss = reset,
                     text = stringResource(
                         R.string.lose,
-                        gameState.score(),
-                        gameState.score(false),
+                        gameState.score(timeBonusEnabled),
                     ),
                 )
             } else if (gameState.stage == GameStage.WIN) {
@@ -226,8 +226,7 @@ fun GameScreen(
                     onDismiss = reset,
                     text = stringResource(
                         R.string.win,
-                        gameState.score(),
-                        gameState.score(false),
+                        gameState.score(timeBonusEnabled),
                     ),
                 )
             }

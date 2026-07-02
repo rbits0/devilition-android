@@ -111,12 +111,14 @@ fun DevilitionApp(
                             addToPastGames = gameViewModel::addToPastGames,
                             startTimer = gameViewModel::startTimer,
                             stopTimer = gameViewModel::stopTimer,
+                            timeBonusEnabled = settingsState.timeBonusEnabled,
                             modifier = Modifier
                                 .fitInside(WindowInsetsRulers.SafeDrawing.current),
                         )
 
                         Destination.Scores -> ScoresScreen(
                             pastGames = pastGamesState,
+                            timeBonusEnabled = settingsState.timeBonusEnabled,
                             modifier = Modifier
                                 .fitInside(WindowInsetsRulers.SafeDrawing.current),
                         )

@@ -54,6 +54,7 @@ fun DevilitionApp(
     val wideNavigationRailState = rememberWideNavigationRailState()
     val gameState by gameViewModel.gameState.collectAsStateWithLifecycle()
     val pastGamesState by gameViewModel.pastGamesState.collectAsStateWithLifecycle()
+    val settingsState by settingsViewModel.settingsState.collectAsStateWithLifecycle()
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val navigationSuiteType = if (windowSizeClass.isWidthAtLeastBreakpoint(
             WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND
@@ -121,7 +122,8 @@ fun DevilitionApp(
                         )
 
                         Destination.Settings -> SettingsScreen(
-                            settingsViewModel = settingsViewModel,
+                            settings = settingsState,
+                            setTimeBonusEnabled = settingsViewModel::setTimeBonusEnabled,
                             modifier = Modifier
                                 .fitInside(WindowInsetsRulers.SafeDrawing.current),
                         )

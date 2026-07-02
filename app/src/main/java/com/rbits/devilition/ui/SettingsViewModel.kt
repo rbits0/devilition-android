@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 class SettingsViewModel(
     private val repository: ISettingsRepository
 ) : ViewModel() {
-    val settingsFlow = repository.settingsFlow.stateIn(
+    val settingsState = repository.settingsFlow.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = Settings(),

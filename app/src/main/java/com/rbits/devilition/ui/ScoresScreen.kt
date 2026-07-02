@@ -15,10 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.rbits.devilition.LIST_SCREEN_PADDING_DP
 import com.rbits.devilition.R
 import com.rbits.devilition.ui.theme.DevilitionTheme
-
-const val SCORES_SCREEN_PADDING_DP = 4
 
 @Composable
 fun ScoresScreen(
@@ -45,7 +44,7 @@ fun ScoresScreen(
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
         modifier = modifier
-            .padding(SCORES_SCREEN_PADDING_DP.dp)
+            .padding(LIST_SCREEN_PADDING_DP.dp)
     ) {
         item {
             SegmentedListItem (

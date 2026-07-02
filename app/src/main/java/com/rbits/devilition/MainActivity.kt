@@ -29,6 +29,8 @@ const val TAG = "devilition"
 const val GAME_STORE_FILE_NAME = "game_state.json"
 const val PAST_GAMES_STORE_FILE_NAME = "past_games.json"
 
+const val LIST_SCREEN_PADDING_DP = 4
+
 private val Context.gameStore: DataStore<GameState> by dataStore(
     fileName = GAME_STORE_FILE_NAME,
     serializer = GameStateSerializer,

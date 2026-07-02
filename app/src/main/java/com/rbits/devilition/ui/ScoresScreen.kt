@@ -1,23 +1,24 @@
 package com.rbits.devilition.ui
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.rbits.devilition.R
 import com.rbits.devilition.ui.theme.DevilitionTheme
 
 const val SCORES_SCREEN_PADDING_DP = 4
-const val SCORES_SCREEN_GAP_DP = 10
 
 @Composable
 fun ScoresScreen(
@@ -36,55 +37,75 @@ fun ScoresScreen(
     val gamesWon = pastGames.count { it.stage == GameStage.WIN }
     val gamesLost = pastGames.count { it.stage == GameStage.LOSE }
 
-    Column(
+    val numListItems = 4
+    val listItemColors = ListItemDefaults.colors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer
+    )
+
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
         modifier = modifier
             .padding(SCORES_SCREEN_PADDING_DP.dp)
     ) {
-        Text(
-            stringResource(R.string.highscore),
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-        )
-        Text(
-            highscore?.toString() ?: "",
-            style = MaterialTheme.typography.bodyLarge,
-        )
+        item {
+            SegmentedListItem (
+                shapes = ListItemDefaults.segmentedShapes(0, numListItems),
+                colors = listItemColors,
+                trailingContent = {
+                    Text(
+                        highscore?.toString() ?: "",
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                },
+            ) {
+                Text(stringResource(R.string.highscore))
+            }
+        }
 
-        Text(
-            stringResource(R.string.games_played),
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .padding(top = SCORES_SCREEN_GAP_DP.dp),
-        )
-        Text(
-            gamesPlayed.toString(),
-            style = MaterialTheme.typography.bodyLarge,
-        )
+        item {
+            SegmentedListItem(
+                shapes = ListItemDefaults.segmentedShapes(1, numListItems),
+                colors = listItemColors,
+                trailingContent = {
+                    Text(
+                        gamesPlayed.toString(),
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                }
+            ) {
+                Text(stringResource(R.string.games_played))
+            }
+        }
 
-        Text(
-            stringResource(R.string.games_won),
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .padding(top = SCORES_SCREEN_GAP_DP.dp),
-        )
-        Text(
-            gamesWon.toString(),
-            style = MaterialTheme.typography.bodyLarge,
-        )
+        item {
+            SegmentedListItem(
+                shapes = ListItemDefaults.segmentedShapes(2, numListItems),
+                colors = listItemColors,
+                trailingContent = {
+                    Text(
+                        gamesWon.toString(),
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                }
+            ) {
+                Text(stringResource(R.string.games_won))
+            }
+        }
 
-        Text(
-            stringResource(R.string.games_lost),
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .padding(top = SCORES_SCREEN_GAP_DP.dp),
-        )
-        Text(
-            gamesLost.toString(),
-            style = MaterialTheme.typography.bodyLarge,
-        )
+        item {
+            SegmentedListItem(
+                shapes = ListItemDefaults.segmentedShapes(3, numListItems),
+                colors = listItemColors,
+                trailingContent = {
+                    Text(
+                        gamesLost.toString(),
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                }
+            ) {
+                Text(stringResource(R.string.games_lost))
+            }
+        }
     }
 }
 

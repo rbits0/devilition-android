@@ -30,6 +30,7 @@ import com.mohamedrejeb.compose.dnd.rememberDragAndDropState
 import com.rbits.devilition.R
 import com.rbits.devilition.data.NUM_ROUNDS
 import com.rbits.devilition.ui.theme.DevilitionTheme
+import com.rbits.devilition.warningButtonColors
 
 @Composable
 fun Hand(
@@ -50,6 +51,7 @@ fun Hand(
     onStartDetonate: () -> Unit,
     onConfirmDetonate: () -> Unit,
     onCancelDetonate: () -> Unit,
+    onReset: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -155,6 +157,13 @@ fun Hand(
                 ) {
                     Text(stringResource(R.string.start_detonate))
                 }
+
+                Button(
+                    onClick = { onReset() },
+                    colors = warningButtonColors(),
+                ) {
+                    Text(stringResource(R.string.reset_game))
+                }
             } else {
                 // Detonate started
                 Row(
@@ -215,6 +224,7 @@ fun HandPreview() {
                 onStartDetonate = {},
                 onConfirmDetonate = {},
                 onCancelDetonate = {},
+                onReset = {},
                 modifier = Modifier
                     .fillMaxSize()
                 ,

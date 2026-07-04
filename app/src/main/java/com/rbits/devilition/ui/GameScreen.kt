@@ -63,6 +63,7 @@ fun GameScreen(
     val dragAndDropState = rememberDragAndDropState<GridItem.Piece>()
     var detonateStarted by remember { mutableStateOf(false) }
     var selectedForDetonation: GridItem.Piece? by remember { mutableStateOf(null) }
+    var resetDialogVisible by remember { mutableStateOf(false) }
 
     val targetedCells by remember(
         dragAndDropState.draggedItem?.data,
@@ -202,6 +203,7 @@ fun GameScreen(
                         detonateStarted = false
                         selectedForDetonation = null
                     },
+                    onReset = { resetDialogVisible = true },
                     modifier = (
                         if (isGridMaxWidth) {
                             Modifier.fillMaxWidth()
@@ -213,7 +215,15 @@ fun GameScreen(
 
             }
 
-            if (gameState.stage == GameStage.LOSE) {
+            if (resetDialogVisible) {
+                ResetDialog(
+                    onDismiss = { resetDialogVisible = false },
+                    onConfirm = {
+                        resetDialogVisible = false
+                        reset()
+                    }
+                )
+            } else if (gameState.stage == GameStage.LOSE) {
                 WinLoseDialog(
                     onDismiss = reset,
                     text = stringResource(

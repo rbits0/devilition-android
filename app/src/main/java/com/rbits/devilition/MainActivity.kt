@@ -5,6 +5,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -43,6 +45,18 @@ private val Context.pastGamesStore: DataStore<List<GameState>> by dataStore(
 )
 
 private val Context.settingsStore by preferencesDataStore(name = "settings")
+
+@Composable
+fun warningButtonColors() = ButtonColors(
+    containerColor = MaterialTheme.colorScheme.error,
+    contentColor = MaterialTheme.colorScheme.onError,
+    disabledContainerColor = MaterialTheme.colorScheme.errorContainer
+        .copy(alpha = 0.2f),
+    disabledContentColor = MaterialTheme.colorScheme.onErrorContainer
+        .copy(alpha = 0.38f),
+)
+
+
 
 class MainActivity : ComponentActivity() {
     private lateinit var gameViewModel: GameViewModel

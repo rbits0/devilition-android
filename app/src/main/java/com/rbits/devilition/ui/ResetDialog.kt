@@ -7,20 +7,28 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import com.rbits.devilition.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WinLoseDialog(
+fun ResetDialog(
     onDismiss: () -> Unit,
-    text: String,
+    onConfirm: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        text = { Text(text) },
-        confirmButton = {
+        text = { Text(stringResource(R.string.confirm_reset)) },
+        dismissButton = {
             TextButton(
                 onClick = onDismiss,
+            ) {
+                Text(stringResource(android.R.string.cancel))
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = onConfirm,
             ) {
                 Text(stringResource(android.R.string.ok))
             }

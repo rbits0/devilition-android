@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.nanoseconds
 
 /** How often the seconds should be saved to GameRepository */
 const val SECONDS_UPDATE_THRESHOLD = 10
@@ -35,6 +36,7 @@ class GameViewModel(
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = listOf(),
     )
+    private var timeOfLastTimerNs: Long? = null
     private var timerJob: Job? = null
 
     // Initialise the state from the repository
@@ -117,8 +119,19 @@ class GameViewModel(
 
     fun startTimer() {
         timerJob = viewModelScope.launch {
+            timeOfLastTimerNs = System.nanoTime()
+            var deltaTimeNs = 1_000_000_000L
             while (true) {
-                delay(1000L)
+                val timeToDelayNs = 1_000_000_000L + (1_000_000_000L - deltaTimeNs)
+                delay(timeToDelayNs.nanoseconds)
+
+                val currentTimeNs = System.nanoTime()
+                deltaTimeNs = if (timeOfLastTimerNs != null) {
+                    currentTimeNs - timeOfLastTimerNs!!
+                } else {
+                    1_000_000_000L
+                }
+                timeOfLastTimerNs = System.nanoTime()
 
                 viewModelScope.launch {
                     val newValue = _gameState.updateAndGet {

@@ -12,6 +12,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,12 +25,15 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.imageResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.rbits.devilition.R
 import com.rbits.devilition.ui.theme.DevilitionTheme
+import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.seconds
+
+const val NUM_EXPLOSION_FRAMES = 6
 
 @Composable
 fun GridCellItem(
@@ -37,8 +45,12 @@ fun GridCellItem(
     targeted: Boolean = false,
     armed: Boolean = false,
 ) {
+    var explosionAnimationState by remember { mutableIntStateOf(0) }
+
     val surfaceColor = if (targeted || armed) {
         MaterialTheme.colorScheme.tertiary
+    } else if (item is GridItem.Explosion) {
+        Color.Transparent
     } else if (item is SpriteItem) {
         MaterialTheme.colorScheme.surfaceVariant
     } else {
@@ -60,6 +72,18 @@ fun GridCellItem(
         null
     }
 
+
+    if (item is GridItem.Explosion) {
+        LaunchedEffect(item.id) {
+            for (i in 0..<NUM_EXPLOSION_FRAMES) {
+                explosionAnimationState = i
+                delay(1.seconds / NUM_EXPLOSION_FRAMES)
+            }
+        }
+    } else {
+        explosionAnimationState = 0
+    }
+
     Surface(
         tonalElevation = elevation,
         shadowElevation = elevation,
@@ -76,18 +100,18 @@ fun GridCellItem(
                 .padding(4.dp),
         ) {
             if (item is SpriteItem) {
+                val bitmap = ImageBitmap.imageResource(
+                    getImageId(item, explosionAnimationState)
+                )
+
                 Image(
-                    bitmap = ImageBitmap.imageResource(getImageId(item)),
+                    bitmap = bitmap,
                     contentDescription = stringResource(R.string.snake),
                     contentScale = ContentScale.Fit,
                     alignment = Alignment.BottomCenter,
                     filterQuality = FilterQuality.None,
                     modifier = Modifier
                         .fillMaxSize()
-//                        .background(Color.Red)
-//                        .clip(GenericShape{ size, layoutDirection ->
-//                            addRect(Rect(0f, 0f, 100f, 100f))
-//                        }),
                 )
             }
         }
@@ -95,7 +119,7 @@ fun GridCellItem(
 }
 
 @DrawableRes
-fun getImageId(item: SpriteItem): Int = (
+fun getImageId(item: SpriteItem, explosionAnimationState: Int = 0): Int = (
         when (item) {
 
             is GridItem.Piece -> {
@@ -154,6 +178,17 @@ fun getImageId(item: SpriteItem): Int = (
                     TownieType.MAN_2 -> R.drawable.townie_man_alt
                     TownieType.WOMAN_1 -> R.drawable.townie_woman
                     TownieType.WOMAN_2 -> R.drawable.townie_woman_alt
+                }
+            }
+
+            is GridItem.Explosion -> {
+                when (explosionAnimationState) {
+                    0 -> R.drawable.explosion_0
+                    1 -> R.drawable.explosion_1
+                    2 -> R.drawable.explosion_2
+                    3 -> R.drawable.explosion_3
+                    4 -> R.drawable.explosion_4
+                    else -> R.drawable.explosion_5
                 }
             }
 

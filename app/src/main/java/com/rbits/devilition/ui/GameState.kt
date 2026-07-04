@@ -121,6 +121,11 @@ sealed class GridItem {
     @Serializable
     class Hole() : GridItem()
 
+    @Serializable
+    data class Explosion(
+        val id: Int,
+    ) : GridItem(), SpriteItem
+
 }
 
 
@@ -512,7 +517,8 @@ data class GameState(
             return
         }
 
-        grid[item.position.x][item.position.y] = null
+        grid[item.position.x][item.position.y] = GridItem.Explosion(idCounter)
+        idCounter++
 
         val cellsToExplode = getPieceTargetCells(item)
 
@@ -650,14 +656,16 @@ data class GameState(
             is GridItem.Demon -> {
                 val newHealth = item.health - 1
                 if (newHealth == 0) {
-                    grid[pos.x][pos.y] = null
+                    grid[pos.x][pos.y] = GridItem.Explosion(idCounter)
+                    idCounter++
                 } else {
                     grid[pos.x][pos.y] = item.copy(health = newHealth)
                 }
             }
 
             is GridItem.Townie -> {
-                grid[pos.x][pos.y] = null
+                grid[pos.x][pos.y] = GridItem.Explosion(idCounter)
+                idCounter++
             }
 
             is GridItem.BossHitbox -> {
@@ -668,10 +676,15 @@ data class GameState(
                 // Damage the boss demon
                 val newHealth = boss.health - 1
                 if (newHealth == 0) {
-                    grid[item.bossPos.x][item.bossPos.y] = null
+                    grid[item.bossPos.x][item.bossPos.y] = GridItem.Explosion(idCounter)
+                    idCounter++
                 } else {
                     grid[item.bossPos.x][item.bossPos.y] = boss.copy(health = newHealth)
                 }
+            }
+
+            is GridItem.Explosion -> {
+                grid[pos.x][pos.y] = null
             }
 
             is GridItem.Hole, null -> return

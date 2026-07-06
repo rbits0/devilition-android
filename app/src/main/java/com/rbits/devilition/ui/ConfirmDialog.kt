@@ -11,14 +11,15 @@ import com.rbits.devilition.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ResetDialog(
+fun ConfirmDialog(
+    text: String,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        text = { Text(stringResource(R.string.confirm_reset)) },
+        text = { Text(text) },
         dismissButton = {
             TextButton(
                 onClick = onDismiss,

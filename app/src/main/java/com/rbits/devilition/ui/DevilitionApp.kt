@@ -125,6 +125,7 @@ fun DevilitionApp(
                         Destination.Settings -> SettingsScreen(
                             settings = settingsState,
                             setTimeBonusEnabled = settingsViewModel::setTimeBonusEnabled,
+                            deletePastGames = gameViewModel::deletePastGames,
                             modifier = Modifier
                                 .fitInside(WindowInsetsRulers.SafeDrawing.current),
                         )

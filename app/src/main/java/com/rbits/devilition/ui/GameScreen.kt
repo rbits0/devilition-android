@@ -242,7 +242,8 @@ fun GameScreen(
             }
 
             if (resetDialogVisible) {
-                ResetDialog(
+                ConfirmDialog(
+                    text = stringResource(R.string.confirm_reset_game),
                     onDismiss = { resetDialogVisible = false },
                     onConfirm = {
                         resetDialogVisible = false

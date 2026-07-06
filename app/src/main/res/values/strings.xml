@@ -19,6 +19,8 @@
     <string name="games_lost">Games Lost</string>
     <string name="enable_time_bonus">Enable time bonus</string>
     <string name="reset_game">Reset game</string>
-    <string name="confirm_reset">Are you sure you want to reset the game?</string>
+    <string name="confirm_reset_game">Are you sure you want to reset the game?</string>
     <string name="explosion">Explosion</string>
+    <string name="delete_past_games">Delete past games</string>
+    <string name="confirm_delete_past_games">Are you sure you want to delete all past games? This will reset your highscore.</string>
 </resources>

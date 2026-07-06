@@ -117,6 +117,12 @@ class GameViewModel(
         }
     }
 
+    fun deletePastGames() {
+        viewModelScope.launch {
+            repository.deletePastGames()
+        }
+    }
+
     fun startTimer() {
         // Don't start timer if it is already active
         if (timerJob?.isActive == true) {

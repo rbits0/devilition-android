@@ -24,6 +24,7 @@ interface IGameRepository {
 
     suspend fun updateState(state: GameState)
     suspend fun addPastGame(gameState: GameState)
+    suspend fun deletePastGames()
 }
 
 class GameRepository(
@@ -59,6 +60,10 @@ class GameRepository(
         pastGamesStore.updateData { pastGames ->
             pastGames + gameState
         }
+    }
+
+    override suspend fun deletePastGames() {
+        pastGamesStore.updateData { listOf() }
     }
 }
 
@@ -120,4 +125,5 @@ class MockGameRepository : IGameRepository {
 
     override suspend fun updateState(state: GameState) {}
     override suspend fun addPastGame(gameState: GameState) {}
+    override suspend fun deletePastGames() {}
 }

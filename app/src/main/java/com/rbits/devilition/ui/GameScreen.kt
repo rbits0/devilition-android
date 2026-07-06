@@ -34,6 +34,7 @@ import com.rbits.devilition.data.GRID_HEIGHT
 import com.rbits.devilition.data.GRID_WIDTH
 import com.rbits.devilition.data.MockGameRepository
 import com.rbits.devilition.ui.theme.DevilitionTheme
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
@@ -64,6 +65,7 @@ fun GameScreen(
     var detonateStarted by remember { mutableStateOf(false) }
     var selectedForDetonation: GridItem.Piece? by remember { mutableStateOf(null) }
     var resetDialogVisible by remember { mutableStateOf(false) }
+    var detonateJob: Job? by remember { mutableStateOf(null) }
 
     val targetedCells by remember(
         dragAndDropState.draggedItem?.data,
@@ -85,8 +87,55 @@ fun GameScreen(
         }
     } }
 
+    fun onDetonate() {
+        val selected = selectedForDetonation
+        selectedForDetonation = null
+        detonateStarted = false
+
+        detonateJob = scope.launch {
+            // gameState doesn't immediately update, so this keeps the up-to-date value
+            var currentState = gameState
+
+            if (selected != null) {
+                currentState = armPiece(selected)
+            }
+
+            while (currentState.stage == GameStage.DETONATION) {
+                delay(DETONATION_STEP_TIME)
+                currentState = runDetonationStep()
+            }
+
+            if (currentState.stage == GameStage.ROUND_END) {
+                currentState = roundEnd()
+            }
+            when (currentState.stage) {
+                GameStage.ROUND_START -> {
+                    delay(DETONATION_STEP_TIME)
+                    roundStart()
+                }
+                GameStage.WIN, GameStage.LOSE -> {
+                    addToPastGames()
+                }
+                else -> {}
+            }
+        }
+    }
+
     LifecycleEventEffect(Lifecycle.Event.ON_START) {
         startTimer()
+
+        // If left composition during detonation, we need to continue it
+        val detonateJob = detonateJob
+        if (detonateJob == null || !detonateJob.isActive) {
+            when (gameState.stage) {
+                GameStage.DETONATION,
+                GameStage.ROUND_END,
+                GameStage.ROUND_START -> {
+                    onDetonate()
+                }
+                else -> {}
+            }
+        }
     }
 
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) {
@@ -98,34 +147,6 @@ fun GameScreen(
             selectedForDetonation = item
         } else {
             rotatePiece(item)
-        }
-    }
-
-    fun onDetonate() {
-        val selected = selectedForDetonation ?: return
-        selectedForDetonation = null
-        detonateStarted = false
-
-        scope.launch {
-            // gameState doesn't immediately update, so this keeps the up-to-date value
-            var currentState = armPiece(selected)
-
-            while (currentState.stage == GameStage.DETONATION) {
-                delay(DETONATION_STEP_TIME)
-                currentState = runDetonationStep()
-            }
-
-            currentState = roundEnd()
-            when (currentState.stage) {
-                GameStage.ROUND_START -> {
-                    delay(DETONATION_STEP_TIME)
-                    roundStart()
-                }
-                GameStage.WIN, GameStage.LOSE -> {
-                    addToPastGames()
-                }
-                else -> {}
-            }
         }
     }
 

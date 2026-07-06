@@ -66,7 +66,7 @@ fun Hand(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .padding(10.dp)
-                .width(IntrinsicSize.Min),
+                .width(IntrinsicSize.Max),
         ) {
 
             Row(

@@ -58,6 +58,7 @@ enum class Direction {
 }
 
 enum class GameStage {
+    NOT_LOADED,
     ROUND_START,
     PLACING_PIECES,
     DETONATION,
@@ -144,7 +145,7 @@ data class GameState(
     var unconfirmedPiece: GridItem.Piece? = null,
     var armedPieces: MutableSet<GridItem.Piece> = mutableSetOf(),
     // stage refers to what actions are about to happen or are happening.
-    var stage: GameStage = GameStage.ROUND_START,
+    var stage: GameStage = GameStage.NOT_LOADED,
     var seconds: Int = 0
 ) {
 

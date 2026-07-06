@@ -121,17 +121,10 @@ class GameViewModel(
         timerJob = viewModelScope.launch {
             timeOfLastTimerNs = System.nanoTime()
             var deltaTimeNs = 1_000_000_000L
+            var timeToDelayNs = 1_000_000_000L
             while (true) {
-                val timeToDelayNs = 1_000_000_000L + (1_000_000_000L - deltaTimeNs)
+                timeToDelayNs = 1_000_000_000L + (timeToDelayNs - deltaTimeNs)
                 delay(timeToDelayNs.nanoseconds)
-
-                val currentTimeNs = System.nanoTime()
-                deltaTimeNs = if (timeOfLastTimerNs != null) {
-                    currentTimeNs - timeOfLastTimerNs!!
-                } else {
-                    1_000_000_000L
-                }
-                timeOfLastTimerNs = System.nanoTime()
 
                 viewModelScope.launch {
                     val newValue = _gameState.updateAndGet {
@@ -144,6 +137,14 @@ class GameViewModel(
                         repository.updateState(newValue)
                     }
                 }
+
+                val currentTimeNs = System.nanoTime()
+                deltaTimeNs = if (timeOfLastTimerNs != null) {
+                    currentTimeNs - timeOfLastTimerNs!!
+                } else {
+                    1_000_000_000L
+                }
+                timeOfLastTimerNs = currentTimeNs
             }
         }
     }

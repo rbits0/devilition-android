@@ -23,4 +23,19 @@
     <string name="explosion">Explosion</string>
     <string name="delete_past_games">Delete past games</string>
     <string name="confirm_delete_past_games">Are you sure you want to delete all past games? This will reset your highscore.</string>
+    <string name="rocket">Blue rocket</string>
+    <string name="rocket_alt">Pink rocket</string>
+    <string name="rocket_pad">Blue rocket pad</string>
+    <string name="rocket_pad_alt">Pink rocket pad</string>
+    <string name="strawman">Strawman</string>
+    <string name="cannon">Cannon</string>
+    <string name="toad">Toad</string>
+    <string name="cross">Cross</string>
+    <string name="plus">Plus</string>
+    <string name="bomb">Bomb</string>
+    <string name="demon_major">Major demon</string>
+    <string name="demon_elder" >Elder demon</string>
+    <string name="demon_boss">Boss demon</string>
+    <string name="demon_minor">Minor demon</string>
+    <string name="townie">Townie</string>
 </resources>

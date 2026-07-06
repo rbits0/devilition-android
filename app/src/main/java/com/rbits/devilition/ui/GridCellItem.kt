@@ -22,8 +22,8 @@ import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.rbits.devilition.R
 import com.rbits.devilition.data.getImageIdFromSprite
+import com.rbits.devilition.data.getStringIdFromSprite
 import com.rbits.devilition.ui.theme.DevilitionTheme
 
 const val NUM_EXPLOSION_FRAMES = 6
@@ -84,8 +84,7 @@ fun GridCellItem(
 
                 Image(
                     bitmap = bitmap,
-                    // TODO: Add correct contentDescription
-                    contentDescription = stringResource(R.string.snake),
+                    contentDescription = stringResource(getStringIdFromSprite(item)),
                     contentScale = ContentScale.Fit,
                     alignment = Alignment.BottomCenter,
                     filterQuality = FilterQuality.None,

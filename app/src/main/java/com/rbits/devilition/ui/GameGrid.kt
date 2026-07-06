@@ -17,7 +17,7 @@ import com.rbits.devilition.ui.theme.DevilitionTheme
 
 @Composable
 fun GameGrid(
-    gridState: Array<Array<GridItem?>>,
+    gridState: List<List<GridItem?>>,
     dragAndDropState: DragAndDropState<GridItem.Piece>,
     detonateStarted: Boolean,
     selectedForDetonation: GridItem.Piece?,
@@ -75,7 +75,7 @@ private const val previewWidth = 375
 @Preview(showBackground = false, widthDp = previewWidth, heightDp = previewHeight)
 @Composable
 fun GameGridPreview() {
-    val gridState = Array(GRID_HEIGHT) { Array<GridItem?>(GRID_WIDTH) {
+    val gridState = List(GRID_HEIGHT) { List<GridItem?>(GRID_WIDTH) {
         if (it % 2 == 0) {
             GridItem.Piece(
                 pieceType = PieceType.SNAKE,

@@ -131,8 +131,8 @@ data class Explosion(
 
 @Serializable
 data class GameState(
-    var grid: Array<Array<GridItem?>> = Array(GRID_HEIGHT) { Array(GRID_WIDTH) { null } },
-    var hand: Array<GridItem.Piece?> = Array(HAND_SIZE) { null },
+    var grid: MutableList<MutableList<GridItem?>> = MutableList(GRID_HEIGHT) { MutableList(GRID_WIDTH) {null} },
+    var hand: MutableList<GridItem.Piece?> = MutableList(HAND_SIZE) { null },
     var bag: List<PieceType> = listOf(),
     var numAvailablePieces: Int = 0,
     var round: Int = 0,
@@ -172,47 +172,9 @@ data class GameState(
     }
 
 
-    // Auto-generated function to handle the array
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as GameState
-
-        if (numAvailablePieces != other.numAvailablePieces) return false
-        if (round != other.round) return false
-        if (idCounter != other.idCounter) return false
-        if (!grid.contentDeepEquals(other.grid)) return false
-        if (!hand.contentEquals(other.hand)) return false
-        if (bag != other.bag) return false
-        if (rocketColor != other.rocketColor) return false
-        if (unconfirmedPiece != other.unconfirmedPiece) return false
-        if (armedPieces != other.armedPieces) return false
-        if (stage != other.stage) return false
-        if (seconds != other.seconds) return false
-
-        return true
-    }
-    // Auto-generated function to handle the array
-    override fun hashCode(): Int {
-        var result = numAvailablePieces
-        result = 31 * result + round
-        result = 31 * result + idCounter
-        result = 31 * result + grid.contentDeepHashCode()
-        result = 31 * result + hand.contentHashCode()
-        result = 31 * result + bag.hashCode()
-        result = 31 * result + rocketColor.hashCode()
-        result = 31 * result + (unconfirmedPiece?.hashCode() ?: 0)
-        result = 31 * result + armedPieces.hashCode()
-        result = 31 * result + stage.hashCode()
-        result = 31 * result + seconds
-        return result
-    }
-
-
     fun clone(): GameState = this.copy(
-        grid = grid.map{ it.clone() }.toTypedArray(),
-        hand = hand.clone(),
+        grid = grid.mapTo(mutableListOf()) { row -> row.toMutableList() },
+        hand = hand.toMutableList(),
     )
 
     fun roundStart() {
@@ -748,7 +710,7 @@ data class GameState(
 }
 
 
-fun getEmptySpaces(grid: Array<Array<GridItem?>>): List<PiecePos.GridPos> {
+fun getEmptySpaces(grid: List<List<GridItem?>>): List<PiecePos.GridPos> {
     return grid.flatMapIndexed { rowIndex, row ->
         row.mapIndexedNotNull { colIndex, item ->
             if (item == null) {

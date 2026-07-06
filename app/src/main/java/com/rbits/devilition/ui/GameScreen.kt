@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -67,14 +66,14 @@ fun GameScreen(
     var resetDialogVisible by remember { mutableStateOf(false) }
     var detonateJob: Job? by remember { mutableStateOf(null) }
 
-    val targetedCells by remember(
+    val targetedCells = remember(
         dragAndDropState.draggedItem?.data,
         dragAndDropState.hoveredDropTargetKey,
         gameState.unconfirmedPiece,
-    ) { derivedStateOf {
+    ) {
         val draggedItem = dragAndDropState.draggedItem?.data
         val position = dragAndDropState.hoveredDropTargetKey
-        val unconfirmedPiece= gameState.unconfirmedPiece
+        val unconfirmedPiece = gameState.unconfirmedPiece
 
         if (draggedItem != null && position is PiecePos.GridPos) {
             gameState.getPieceTargetCells(
@@ -85,7 +84,14 @@ fun GameScreen(
         } else {
             null
         }
-    } }
+    }
+
+    val armedCells = remember(gameState.armedPieces) {
+        gameState.armedPieces.mapNotNullTo(mutableSetOf()) {
+                piece -> piece.position as? PiecePos.GridPos
+        }
+    }
+
 
     fun onDetonate() {
         val selected = selectedForDetonation
@@ -188,9 +194,7 @@ fun GameScreen(
                     onItemDropped = movePiece,
                     detonateStarted = detonateStarted,
                     selectedForDetonation = selectedForDetonation,
-                    armedCells = gameState.armedPieces.mapNotNullTo(mutableSetOf()) {
-                        piece -> piece.position as? PiecePos.GridPos
-                    },
+                    armedCells = armedCells,
                     targetedCells = targetedCells,
                     explosions = gameState.explosions,
                     onItemClicked = { onItemClicked(it) },

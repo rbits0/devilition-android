@@ -34,7 +34,7 @@ import com.rbits.devilition.warningButtonColors
 
 @Composable
 fun Hand(
-    handState: Array<GridItem.Piece?>,
+    handState: List<GridItem.Piece?>,
     numAvailablePieces: Int,
     round: Int,
     seconds: Int,
@@ -202,7 +202,7 @@ fun HandPreview() {
             modifier = Modifier.size(previewWidth.dp, previewHeight.dp)
         ) {
             Hand(
-                handState = Array(3) { i -> GridItem.Piece(
+                handState = List(3) { i -> GridItem.Piece(
                     pieceType = PieceType.SNAKE,
                     id = i,
                     facing = Direction.DOWN,

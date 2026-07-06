@@ -23,8 +23,8 @@ import com.rbits.devilition.ui.theme.DevilitionTheme
 @Composable
 fun ScoresScreen(
     pastGames: List<GameState>,
-    timeBonusEnabled: Boolean = true,
     modifier: Modifier = Modifier,
+    timeBonusEnabled: Boolean = true,
 ) {
     val highscore = remember {
         pastGames

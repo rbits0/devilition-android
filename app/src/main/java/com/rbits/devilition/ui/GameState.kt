@@ -16,7 +16,6 @@ import java.util.Locale
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.math.max
-import kotlin.math.round
 import kotlin.math.roundToInt
 
 enum class DemonType {
@@ -644,7 +643,6 @@ data class GameState(
         }
         gridCellsToExplode.removeAll(bossHitboxes)
 
-        Log.i(TAG, "$gridCellsToExplode")
         return gridCellsToExplode
     }
 

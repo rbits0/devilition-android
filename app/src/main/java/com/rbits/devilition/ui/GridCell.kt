@@ -34,7 +34,6 @@ import com.rbits.devilition.R
 import com.rbits.devilition.data.getImageIdFromSprite
 import com.rbits.devilition.ui.theme.DevilitionTheme
 import kotlinx.coroutines.delay
-import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun GridCell(

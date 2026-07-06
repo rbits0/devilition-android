@@ -11,7 +11,6 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteItem
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.material3.adaptive.navigationsuite.rememberNavigationSuiteScaffoldState
-import androidx.compose.material3.rememberWideNavigationRailState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,7 +50,6 @@ fun DevilitionApp(
     val navController = rememberNavController()
     var selectedDestination by remember { mutableStateOf(Destination.Game) }
     val navigationSuiteState = rememberNavigationSuiteScaffoldState()
-    val wideNavigationRailState = rememberWideNavigationRailState()
     val gameState by gameViewModel.gameState.collectAsStateWithLifecycle()
     val pastGamesState by gameViewModel.pastGamesState.collectAsStateWithLifecycle()
     val settingsState by settingsViewModel.settingsState.collectAsStateWithLifecycle()
@@ -91,6 +89,7 @@ fun DevilitionApp(
                 )
             }
         },
+        modifier = modifier,
     ) {
         NavHost(navController = navController, startDestination = Destination.Game.route) {
             for (destination in Destination.entries) {

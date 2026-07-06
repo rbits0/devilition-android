@@ -118,6 +118,11 @@ class GameViewModel(
     }
 
     fun startTimer() {
+        // Don't start timer if it is already active
+        if (timerJob?.isActive == true) {
+            return
+        }
+
         timerJob = viewModelScope.launch {
             timeOfLastTimerNs = System.nanoTime()
             var deltaTimeNs = 1_000_000_000L

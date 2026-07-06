@@ -121,13 +121,12 @@ sealed class GridItem {
 
     @Serializable
     class Hole() : GridItem()
-
-    @Serializable
-    data class Explosion(
-        val id: Int,
-    ) : GridItem(), SpriteItem
-
 }
+
+@Serializable
+data class Explosion(
+    val id: Int,
+) : SpriteItem
 
 
 
@@ -146,7 +145,8 @@ data class GameState(
     var armedPieces: MutableSet<GridItem.Piece> = mutableSetOf(),
     // stage refers to what actions are about to happen or are happening.
     var stage: GameStage = GameStage.NOT_LOADED,
-    var seconds: Int = 0
+    var seconds: Int = 0,
+    var explosions: MutableMap<PiecePos.GridPos, Explosion> = mutableMapOf(),
 ) {
 
     companion object {
@@ -458,6 +458,7 @@ data class GameState(
     fun runDetonationStep() {
         val armedPieces = armedPieces.toSet()
         this.armedPieces.clear()
+        explosions.clear()
 
         if (armedPieces.isEmpty()) {
             stage = GameStage.ROUND_END
@@ -518,7 +519,8 @@ data class GameState(
             return
         }
 
-        grid[item.position.x][item.position.y] = GridItem.Explosion(idCounter)
+        grid[item.position.x][item.position.y] = null
+        explosions[item.position] = Explosion(idCounter)
         idCounter++
 
         val cellsToExplode = getPieceTargetCells(item)
@@ -656,16 +658,19 @@ data class GameState(
 
             is GridItem.Demon -> {
                 val newHealth = item.health - 1
+                explosions[pos] = Explosion(idCounter)
+                idCounter++
+
                 if (newHealth == 0) {
-                    grid[pos.x][pos.y] = GridItem.Explosion(idCounter)
-                    idCounter++
+                    grid[pos.x][pos.y] = null
                 } else {
                     grid[pos.x][pos.y] = item.copy(health = newHealth)
                 }
             }
 
             is GridItem.Townie -> {
-                grid[pos.x][pos.y] = GridItem.Explosion(idCounter)
+                grid[pos.x][pos.y] = null
+                explosions[pos] = Explosion(idCounter)
                 idCounter++
             }
 
@@ -676,16 +681,14 @@ data class GameState(
 
                 // Damage the boss demon
                 val newHealth = boss.health - 1
+                explosions[pos] = Explosion(idCounter)
+                idCounter++
+
                 if (newHealth == 0) {
-                    grid[item.bossPos.x][item.bossPos.y] = GridItem.Explosion(idCounter)
-                    idCounter++
+                    grid[item.bossPos.x][item.bossPos.y] = null
                 } else {
                     grid[item.bossPos.x][item.bossPos.y] = boss.copy(health = newHealth)
                 }
-            }
-
-            is GridItem.Explosion -> {
-                grid[pos.x][pos.y] = null
             }
 
             is GridItem.Hole, null -> return

@@ -192,6 +192,7 @@ fun GameScreen(
                         piece -> piece.position as? PiecePos.GridPos
                     },
                     targetedCells = targetedCells,
+                    explosions = gameState.explosions,
                     onItemClicked = { onItemClicked(it) },
                     modifier = Modifier
                         .width(IntrinsicSize.Min)

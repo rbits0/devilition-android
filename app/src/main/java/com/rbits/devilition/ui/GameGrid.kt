@@ -22,6 +22,7 @@ fun GameGrid(
     detonateStarted: Boolean,
     selectedForDetonation: GridItem.Piece?,
     armedCells: Set<PiecePos.GridPos>,
+    explosions: Map<PiecePos.GridPos, Explosion>,
     onItemDropped: (GridItem.Piece, PiecePos.GridPos) -> Unit,
     onItemClicked: (GridItem.Piece) -> Unit,
     modifier: Modifier = Modifier,
@@ -55,6 +56,7 @@ fun GameGrid(
                                 ?: false
                         ),
                         armed = armedCells.contains(position),
+                        explosion = explosions[position],
                         modifier = Modifier
                             .weight(1f),
                     )
@@ -96,6 +98,7 @@ fun GameGridPreview() {
                 detonateStarted = false,
                 selectedForDetonation = null,
                 armedCells = setOf(),
+                explosions = mapOf(),
                 onItemDropped = {_, _ -> },
                 onItemClicked = {},
                 modifier = Modifier,

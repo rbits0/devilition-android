@@ -64,10 +64,14 @@ class GameRepository(
 
 object GameStateSerializer : Serializer<GameState> {
     override val defaultValue = GameState.new()
+    private val json = Json {
+        // Allows serialisation of gameState.explosions
+        allowStructuredMapKeys = true
+    }
 
     override suspend fun readFrom(input: InputStream) =
         try {
-            Json.decodeFromString<GameState>(
+            json.decodeFromString<GameState>(
                 input.readBytes().decodeToString()
             )
         } catch (serialization: SerializationException) {
@@ -77,7 +81,7 @@ object GameStateSerializer : Serializer<GameState> {
     override suspend fun writeTo(t: GameState, output: OutputStream) {
         withContext(Dispatchers.IO) {
             output.write(
-                Json.encodeToString(t)
+                json.encodeToString(t)
                     .encodeToByteArray()
             )
         }
@@ -86,10 +90,14 @@ object GameStateSerializer : Serializer<GameState> {
 
 object PastGamesSerializer : Serializer<List<GameState>> {
     override val defaultValue: List<GameState> = listOf()
+    private val json = Json {
+        // Allows serialisation of gameState.explosions
+        allowStructuredMapKeys = true
+    }
 
     override suspend fun readFrom(input: InputStream) =
         try {
-            Json.decodeFromString<List<GameState>>(
+            json.decodeFromString<List<GameState>>(
                 input.readBytes().decodeToString()
             )
         } catch (serialization: SerializationException) {
@@ -99,7 +107,7 @@ object PastGamesSerializer : Serializer<List<GameState>> {
     override suspend fun writeTo(t: List<GameState>, output: OutputStream) {
         withContext(Dispatchers.IO) {
             output.write(
-                Json.encodeToString(t)
+                json.encodeToString(t, )
                     .encodeToByteArray()
             )
         }
